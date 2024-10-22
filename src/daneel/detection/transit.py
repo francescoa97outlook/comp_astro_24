@@ -6,14 +6,18 @@ matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
-    # Set a variables containing the absolute path of the starting folder
-    path_default = str(Path(__file__).parent.resolve()).replace(
-        str(Path("src", "daneel", "detection")), ""
+    # Set a variables containing the absolute
+    # path of the starting folder
+    path_default = (
+        str(Path(__file__).parent.resolve()).replace(
+            str(Path("src", "daneel", "detection")), ""
+        )
     )
     # planet chosen to complete this task
-    # All the following parameters values where retrieved from the link:
+    # All the following parameter values where
+    # retrieved from the link:
     # https://exoplanetarchive.ipac.caltech.edu/overview/WASP-107%20b#planet_WASP-107-b_collapsible
-    # The period and Rp/R✶ parameters were selected from Kokori
+    # The period and Rp/R_star parameters were selected from Kokori
     # while the others from Anderson
     planet_name = "WASP107-b"
     # object to store transit parameters
@@ -51,6 +55,12 @@ if __name__ == "__main__":
     plt.plot(t, flux)
     plt.xlabel("Time from central transit")
     plt.ylabel("Relative flux")
-    plt.savefig(str(Path(path_default, "src", "daneel", "detection", "WASP107-b_assignment1_taskF.png")))
-    plt.savefig(str(Path(path_default, "Results", "assignment1", "WASP107-b_assignment1_taskF.png")))
+    plt.savefig(str(Path(
+        path_default, "src", "daneel", "detection",
+        "WASP107-b_assignment1_taskF.png"
+    )))
+    plt.savefig(str(Path(
+        path_default, "Results", "assignment1",
+        "WASP107-b_assignment1_taskF.png"
+    )))
     plt.show()
