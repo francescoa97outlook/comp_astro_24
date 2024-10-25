@@ -1,7 +1,7 @@
 import datetime
 import argparse
-from daneel.parameters import Parameters
-from daneel.detection import *
+from daneel.parameters.parameters import Parameters
+from daneel.detection.transit_yaml import transit_yaml
 
 
 def main():
@@ -26,9 +26,18 @@ def main():
     )
 
     parser.add_argument(
+        "-t",
+        "--transit",
+        dest="transit",
+        required=False,
+        help="Select the transit method",
+        action="store_true",
+    )
+
+    parser.add_argument(
         "-a",
         "--atmosphere",
-        dest="complete",
+        dest="atmosphere",
         required=False,
         help="Atmospheric Characterisazion from input transmission spectrum",
         action="store_true",
@@ -46,6 +55,9 @@ def main():
         pass
     if args.atmosphere:
         pass
+    if args.transit:
+        # call the transit.py file
+        transit_yaml(input_pars)
 
     finish = datetime.datetime.now()
     print(f"Daneel finishes at {finish}")

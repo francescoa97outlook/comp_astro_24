@@ -23,7 +23,7 @@ def load_limb_coeff(limb_dark_path):
     return mean_c1, mean_e1, mean_c2, mean_e2
 
 
-if __name__ == "__main__":
+def transit_yaml(yaml_params):
     # Set a variables containing the absolute
     # path of the starting folder
     path_default = (
@@ -31,40 +31,34 @@ if __name__ == "__main__":
             str(Path("src", "daneel", "detection")), ""
         )
     )
-    # planet chosen to complete this task
-    # All the following parameter values where
-    # retrieved from the link:
-    # https://exoplanetarchive.ipac.caltech.edu/overview/WASP-107%20b#planet_WASP-107-b_collapsible
-    # The period and Rp/R_star parameters were selected from Kokori
-    # while the others from Anderson
-    planet_name = "WASP107-b"
+    planet_name = yaml_params["planet_name"]
     # object to store transit parameters
     params = batman.TransitParams()
     # time of inferior conjunction
-    params.t0 = 0.
+    params.t0 = yaml_params["t0"]
     # orbital period (in days)
-    params.per = 5.72148926
+    params.per = yaml_params["per"]
     # planet radius (in units of stellar radii)
-    params.rp = 0.1446
+    params.rp = yaml_params["rp"]
     # semi-major axis (in units of stellar radii)
-    params.a = 18.2
+    params.a = yaml_params["a"]
     # orbital inclination (in degrees)
-    params.inc = 89.7
+    params.inc = yaml_params["inc"]
     # eccentricity
-    params.ecc = 0.
+    params.ecc = yaml_params["ecc"]
     # longitude of periastron (in degrees)
-    params.w = 90.
+    params.w = yaml_params["w"]
+    # transit time between point 1 and 4 in hours
+    t14h = yaml_params["t14h"]
+    # transit time in days
+    t14d = t14h / 24
     # limb darkening model
-    params.limb_dark = "quadratic"
+    params.limb_dark = yaml_params["limb_dark"]
     # Coefficients limb darkening
-    file_limb_dark = str(Path(path_default, "src", "daneel", "detection", "limb_dark_wasp107b.txt"))
+    file_limb_dark = str(Path(path_default, "Data", "assignment1", "limb_dark_wasp107b.txt"))
     c1, e1, c2, e2 = load_limb_coeff(file_limb_dark)
     # limb darkening coefficients [c1, c2]
     params.u = [c1, c2]
-    # transit time between point 1 and 4 in hours
-    t14h = 2.753
-    # transit time in days
-    t14d = t14h / 24
     limit_transit = t14d / 2 + 0.3 * t14d
     # times at which to calculate light curve (days)
     t = linspace(-limit_transit, limit_transit, 5000)
@@ -76,14 +70,15 @@ if __name__ == "__main__":
     plt.plot(t, flux)
     plt.xlabel("Time from central transit")
     plt.ylabel("Relative flux")
+    plt.title(planet_name)
     '''
     plt.savefig(str(Path(
         path_default, "src", "daneel", "detection",
-        "WASP107-b_assignment1_taskF.png"
+        planet_name + "_assignment1_taskF.png"
     )))
     '''
     plt.savefig(str(Path(
         path_default, "Results", "assignment1",
-        "WASP107-b_assignment1_taskF.png"
+        planet_name + "_assignment1_taskF.png"
     )))
     plt.show()
