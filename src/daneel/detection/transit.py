@@ -1,9 +1,27 @@
 import batman
-from numpy import linspace
+from numpy import linspace, array
 import matplotlib
 from pathlib import Path
-matplotlib.use('Qt5Agg')
+from pandas import read_csv
 import matplotlib.pyplot as plt
+matplotlib.use('Qt5Agg')
+
+
+# This function return the coefficients for the
+# quadratic parametrization of the limb darkening
+def load_limb_coeff(limb_dark_path):
+    # Storing the file information into a dataframe
+    df = read_csv(limb_dark_path, sep='\s+')
+    # Filtering the dataframe to obtain only
+    # the one with a quadratic profile
+    row = df[df["profile"] == "quadratic"]
+    # Mean of the coefficients
+    mean_c1 = array(row["c1"], dtype=float).mean()
+    mean_e1 = array(row["e1"], dtype=float).mean()
+    mean_c2 = array(row["c2"], dtype=float).mean()
+    mean_e2 = array(row["e2"], dtype=float).mean()
+    return mean_c1, mean_e1, mean_c2, mean_e2
+
 
 if __name__ == "__main__":
     # Set a variables containing the absolute
@@ -37,9 +55,12 @@ if __name__ == "__main__":
     # longitude of periastron (in degrees)
     params.w = 90.
     # limb darkening model
-    params.limb_dark = "nonlinear"
-    # limb darkening coefficients [u1, u2, u3, u4]
-    params.u = [0.5, 0.1, 0.1, -0.1]
+    params.limb_dark = "quadratic"
+    # Coefficients limb darkening
+    file_limb_dark = str(Path(path_default, "src", "daneel", "detection", "limb_dark_wasp107b.txt"))
+    c1, e1, c2, e2 = load_limb_coeff(file_limb_dark)
+    # limb darkening coefficients [c1, c2]
+    params.u = [c1, c2]
     # transit time between point 1 and 4 in hours
     t14h = 2.753
     # transit time in days
