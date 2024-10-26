@@ -23,14 +23,7 @@ def load_limb_coeff(limb_dark_path):
     return mean_c1, mean_e1, mean_c2, mean_e2
 
 
-def transit_yaml(yaml_params):
-    # Set a variables containing the absolute
-    # path of the starting folder
-    path_default = (
-        str(Path(__file__).parent.resolve()).replace(
-            str(Path("src", "daneel", "detection")), ""
-        )
-    )
+def transit_yaml(yaml_params, output_folder_path, input_folder_path):
     planet_name = yaml_params["planet_name"]
     # object to store transit parameters
     params = batman.TransitParams()
@@ -55,7 +48,7 @@ def transit_yaml(yaml_params):
     # limb darkening model
     params.limb_dark = yaml_params["limb_dark"]
     # Coefficients limb darkening
-    file_limb_dark = str(Path(path_default, "Data", "assignment1", "limb_dark_wasp107b.txt"))
+    file_limb_dark = str(Path(input_folder_path, yaml_params["file_limb_dark"]))
     c1, e1, c2, e2 = load_limb_coeff(file_limb_dark)
     # limb darkening coefficients [c1, c2]
     params.u = [c1, c2]
@@ -71,14 +64,8 @@ def transit_yaml(yaml_params):
     plt.xlabel("Time from central transit")
     plt.ylabel("Relative flux")
     plt.title(planet_name)
-    '''
     plt.savefig(str(Path(
-        path_default, "src", "daneel", "detection",
-        planet_name + "_assignment1_taskF.png"
-    )))
-    '''
-    plt.savefig(str(Path(
-        path_default, "Results", "assignment1",
+        output_folder_path,
         planet_name + "_assignment1_taskF.png"
     )))
     plt.show()

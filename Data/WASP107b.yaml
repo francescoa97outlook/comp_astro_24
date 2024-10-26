@@ -8,4 +8,4 @@ ecc : 0.
 w : 90.
 t14h : 2.753
 limb_dark : "quadratic"
-file_limb_dark : "Data/assignment1/limb_dark_wasp107b.txt"
+file_limb_dark : "limb_dark_wasp107b.txt"
