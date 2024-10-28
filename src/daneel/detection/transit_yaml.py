@@ -63,7 +63,7 @@ def transit_yaml(yaml_params, output_folder_path, input_folder_path):
     plt.plot(t, flux)
     plt.xlabel("Time from central transit")
     plt.ylabel("Relative flux")
-    plt.title(planet_name)
+    plt.title(planet_name + " light curve")
     plt.savefig(str(Path(
         output_folder_path,
         planet_name + "_assignment1_taskF.png"
