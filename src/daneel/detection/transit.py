@@ -57,7 +57,10 @@ if __name__ == "__main__":
     # limb darkening model
     params.limb_dark = "quadratic"
     # Coefficients limb darkening
-    file_limb_dark = str(Path(path_default, "src", "daneel", "detection", "limb_dark_wasp107b.txt"))
+    file_limb_dark = str(Path(
+        path_default, "Data", "assignment1",
+        "limb_dark_wasp107b.txt"
+    ))
     c1, e1, c2, e2 = load_limb_coeff(file_limb_dark)
     # limb darkening coefficients [c1, c2]
     params.u = [c1, c2]
@@ -76,12 +79,7 @@ if __name__ == "__main__":
     plt.plot(t, flux)
     plt.xlabel("Time from central transit")
     plt.ylabel("Relative flux")
-    '''
-    plt.savefig(str(Path(
-        path_default, "src", "daneel", "detection",
-        "WASP107-b_assignment1_taskF.png"
-    )))
-    '''
+    plt.title(planet_name + " light curve")
     plt.savefig(str(Path(
         path_default, "Results", "assignment1",
         "WASP107-b_assignment1_taskF.png"
