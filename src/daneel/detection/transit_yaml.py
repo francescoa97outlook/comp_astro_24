@@ -10,11 +10,6 @@ matplotlib.use('Qt5Agg')
 # This function return the coefficients for the
 # quadratic parametrization of the limb darkening
 def load_limb_coeff(limb_dark_path, profile):
-    profile = "square-root" if profile == "squareroot" else profile
-    profile = "custom LD" if (
-            profile == "3-parameter" or
-            profile == "4-parameter"
-    ) else profile
     # Storing the file information into a dataframe
     df = read_csv(limb_dark_path, sep='\s+')
     # Filtering the dataframe to obtain only
