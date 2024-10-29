@@ -45,9 +45,10 @@ def main():
         help="""
         Directory of the limb darkening file (or others). 
         If you want to set another folder to get your 
-        input data, use this option. In this case, just put the 
-        absolute path of the folder. Otherwise, put your data 
-        inside the Data folder (default one) and do not use this option.
+        input data, use this option. In this case,  
+        just put the absolute path of the folder.  
+        Otherwise, put your data inside the Data 
+        folder (default one) and do not use this option.
         """
     )
     # Define an expected output folder with command -res.
@@ -62,9 +63,9 @@ def main():
         help="""
             Directory where to store the results. 
             If you want to set another folder to store your 
-            output data, use this option. In this case, just put the 
-            absolute path of the folder. Otherwise, the output will 
-            be stored in the Results folder.
+            output data, use this option. In this case,  
+            just put the absolute path of the folder. Otherwise, 
+            the output will be stored in the Results folder.
             """
     )
     #
@@ -82,7 +83,8 @@ def main():
         "--atmosphere",
         dest="atmosphere",
         required=False,
-        help="Atmospheric Characterisazion from input transmission spectrum",
+        help="Atmospheric Characterisazion from "
+             "input transmission spectrum",
         action="store_true",
     )
     # This command will parse (convert) the arguments
@@ -102,7 +104,9 @@ def main():
     # defined from the argument.
     # If not, it will be the default path
     if args.directory_limb:
-        input_folder_path_light_curve = str(Path(args.directory_limb))
+        input_folder_path_light_curve = str(Path(
+            args.directory_limb
+        ))
     else:
         input_folder_path_light_curve = str(Path(
             path_default.replace(
@@ -115,7 +119,9 @@ def main():
     # defined from the argument.
     # If not, it will be the default path
     if args.directory_results:
-        output_folder_path_light_curve = str(Path(args.directory_results))
+        output_folder_path_light_curve = str(Path(
+            args.directory_results
+        ))
     else:
         output_folder_path_light_curve = str(Path(
             path_default.replace(
@@ -135,7 +141,8 @@ def main():
     if args.transit:
         # call the transit.py file
         transit_yaml(
-            input_params, output_folder_path_light_curve, input_folder_path_light_curve
+            input_params, output_folder_path_light_curve,
+            input_folder_path_light_curve
         )
     # End of the program
     finish = datetime.datetime.now()

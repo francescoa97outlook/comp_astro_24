@@ -23,6 +23,8 @@ def load_limb_coeff(limb_dark_path, profile):
     return array([mean_c1, mean_c2, mean_c3, mean_c4])
 
 
+# Function that calculate the light curve
+# using batman package
 def transit_yaml(yaml_params, output_folder_path, input_folder_path):
     planet_name = yaml_params["planet_name"]
     # object to store transit parameters
@@ -59,7 +61,9 @@ def transit_yaml(yaml_params, output_folder_path, input_folder_path):
     limb_dark_coeff = load_limb_coeff(
         file_limb_dark, csv_profile_name
     )
-    # limb darkening coefficients [c1, c2]
+    # limb darkening coefficients
+    # In this way they could be from 1 to 4
+    # depending on the method
     params.u = limb_dark_coeff[~isnan(limb_dark_coeff)]
     limit_transit = t14d / 2 + 0.3 * t14d
     # times at which to calculate light curve (days)
