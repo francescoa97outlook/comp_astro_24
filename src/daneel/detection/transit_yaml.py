@@ -8,12 +8,12 @@ matplotlib.use('Qt5Agg')
 
 
 # This function return the coefficients for the
-# quadratic parametrization of the limb darkening
+# parametrization of the limb darkening
 def load_limb_coeff(limb_dark_path, profile):
     # Storing the file information into a dataframe
     df = read_csv(limb_dark_path, sep='\s+')
     # Filtering the dataframe to obtain only
-    # the one with a quadratic profile
+    # the one with the selected profile
     row = df[df["profile"] == profile]
     # Mean of the coefficients
     mean_c1 = array(row["c1"], dtype=float).mean()

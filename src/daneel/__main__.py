@@ -7,6 +7,7 @@ from daneel.detection.transit_yaml import transit_yaml
 
 
 # Function that is called at the beginning
+# or directly from daneel command
 def main():
     # Create a ArgumentParser object to work
     # with script argument
@@ -142,6 +143,7 @@ def main():
     print(f"Daneel finishes at {finish}")
 
 
-# Main function that will be executed calling "daneel"
+# Main function that will be executed by
+# launching normally the script
 if __name__ == "__main__":
     main()
