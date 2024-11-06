@@ -2,12 +2,12 @@ import datetime
 import argparse
 from pathlib import Path
 
-from daneel.parameters.parameters import Parameters
-from daneel.detection.transit_yaml import transit_yaml
+from pyELIJAH.parameters.parameters import Parameters
+from pyELIJAH.detection.transit.transit_yaml import transit_yaml
 
 
 # Function that is called at the beginning
-# or directly from daneel command
+# or directly from pyELIJAH command
 def main():
     # Create a ArgumentParser object to work
     # with script argument
@@ -94,9 +94,9 @@ def main():
     # Set a variables containing the absolute
     # path of the starting folder
     path_default = str(Path(__file__).parent)
-    # Launch Daneel
+    # Launch pyELIJAH
     start = datetime.datetime.now()
-    print(f"Daneel starts at {start}")
+    print(f"pyELIJAH starts at {start}")
     # Define the required input folder in which are retrieved
     # the planets parameters
     input_params = Parameters(args.input_file).params
@@ -111,7 +111,7 @@ def main():
     else:
         input_folder_path_light_curve = str(Path(
             path_default.replace(
-                str(Path("src", "daneel")), ""
+                str(Path("src", "pyELIJAH")), ""
             ),
             "Data", "assignment1",
         ))
@@ -126,7 +126,7 @@ def main():
     else:
         output_folder_path_light_curve = str(Path(
             path_default.replace(
-                str(Path("src", "daneel")), ""
+                str(Path("src", "pyELIJAH")), ""
             ),
             "Results", "assignment1",
         ))
@@ -147,7 +147,7 @@ def main():
         )
     # End of the program
     finish = datetime.datetime.now()
-    print(f"Daneel finishes at {finish}")
+    print(f"pyELIJAH finishes at {finish}")
 
 
 # Main function that will be executed by

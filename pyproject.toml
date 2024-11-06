@@ -3,13 +3,29 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "daneel"
+name = "pyELIJAH"
 version = "0.0.1"
-authors = [{ name = "Tiziano Zingales", email = "tiziano.zingales@unipd.it" }]
-description = "A practical example to detect and characterize exoplanets"
+authors = [
+    { name = "Francesco Amadori", email = "francesco.a97.ing@outlook.it" },
+    { name = "Paula Manuela Leguizamon Pineda", email = "paulamanuela.leguizamonpineda@studenti.unibo.it" },
+    { name = "Leonardo Dal Cin", email = "leonardo.dalcin@studenti.unibo.it" },
+    { name = "Tiziano Zingales", email = "tiziano.zingales@unipd.it" }
+]
+description = "A basic tool to detect (transit) and characterize exoplanets atmospheres"
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = ["PyYAML"]
+dependencies = [
+    "astropy",
+    "contourpy",
+    "PyYAML",
+    "batman-package",
+    "matplotlib",
+    "pyqt5",
+    "pandas",
+    "sphinx",
+    "pillow",
+    "numpy==1.24.3",
+]
 
 
 classifiers = [
@@ -19,8 +35,8 @@ classifiers = [
 ]
 
 [project.scripts]
-daneel = "daneel.__main__:main"
+pyELIJAH = "pyELIJAH.__main__:main"
 
 [project.urls]
-Homepage = "https://github.com/tiziano1590/comp_astro_24"
-Issues = "https://github.com/tiziano1590/comp_astro_24/issues"
+Homepage = "https://github.com/francescoa97outlook/pyELIJAH"
+Issues = "https://github.com/francescoa97outlook/pyELIJAH/issues"

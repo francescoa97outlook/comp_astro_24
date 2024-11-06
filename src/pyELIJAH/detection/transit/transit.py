@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # path of the starting folder
     path_default = (
         str(Path(__file__).parent.resolve()).replace(
-            str(Path("src", "daneel", "detection")), ""
+            str(Path("src", "pyELIJAH", "detection", "transit")), ""
         )
     )
     # planet chosen to complete this task
