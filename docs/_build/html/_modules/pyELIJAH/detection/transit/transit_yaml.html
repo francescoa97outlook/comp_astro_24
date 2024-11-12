@@ -1,0 +1,224 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyELIJAH.detection.transit.transit_yaml &mdash; pyELIJAH 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyELIJAH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">pyELIJAH</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyELIJAH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyELIJAH.detection.transit.transit_yaml</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyELIJAH.detection.transit.transit_yaml</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">batman</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">linspace</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">isnan</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">read_csv</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Qt5Agg&#39;</span><span class="p">)</span>
+
+
+<span class="c1">#</span>
+
+<div class="viewcode-block" id="load_limb_coeff">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.transit.html#pyELIJAH.detection.transit.transit_yaml.load_limb_coeff">[docs]</a>
+<span class="k">def</span> <span class="nf">load_limb_coeff</span><span class="p">(</span><span class="n">limb_dark_path</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function return the coefficients for the parametrization</span>
+<span class="sd">    of the limb darkening</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        limb_dark_path:</span>
+<span class="sd">            string containing the path to the limb darkening</span>
+<span class="sd">            csv file produced by https://exoctk.stsci.edu/limb_darkening</span>
+<span class="sd">        profile:</span>
+<span class="sd">            string containing the name of the profile. Possible values:</span>
+<span class="sd">            [&quot;quadratic&quot;, &quot;exponential&quot;, &quot;linear&quot;, logarithmic&quot;, &quot;square-root&quot;]</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">        an array containing the mean of at maximum 4 limb darkening coefficients</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Storing the file information into a dataframe</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">limb_dark_path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;\s+&#39;</span><span class="p">)</span>
+    <span class="c1"># Filtering the dataframe to obtain only</span>
+    <span class="c1"># the one with the selected profile</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">profile</span><span class="p">]</span>
+    <span class="c1"># Mean of the coefficients</span>
+    <span class="n">mean_c1</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">mean_c2</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;c2&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">mean_c3</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;c3&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">mean_c4</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;c4&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">array</span><span class="p">([</span><span class="n">mean_c1</span><span class="p">,</span> <span class="n">mean_c2</span><span class="p">,</span> <span class="n">mean_c3</span><span class="p">,</span> <span class="n">mean_c4</span><span class="p">])</span></div>
+
+
+
+<span class="c1"># using batman package</span>
+<div class="viewcode-block" id="transit_yaml">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.transit.html#pyELIJAH.detection.transit.transit_yaml.transit_yaml">[docs]</a>
+<span class="k">def</span> <span class="nf">transit_yaml</span><span class="p">(</span><span class="n">yaml_params</span><span class="p">,</span> <span class="n">output_folder_path</span><span class="p">,</span> <span class="n">input_folder_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function calculates the light curve of the transit</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            yaml_params:</span>
+<span class="sd">                object of Parameters class containing the keys and values</span>
+<span class="sd">                of the stored in the yaml file</span>
+<span class="sd">            output_folder_path:</span>
+<span class="sd">                string containing the path to the output folder, where to save results</span>
+<span class="sd">            input_folder_path:</span>
+<span class="sd">                string containing the path to the input folder, where to retrieve</span>
+<span class="sd">                the files needed for the algorithm</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            an array containing the mean of at maximum 4 limb darkening coefficients</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">planet_name</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;planet_name&quot;</span><span class="p">]</span>
+    <span class="c1"># object to store transit parameters</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitParams</span><span class="p">()</span>
+    <span class="c1"># time of inferior conjunction</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;t0&quot;</span><span class="p">]</span>
+    <span class="c1"># orbital period (in days)</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">per</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;per&quot;</span><span class="p">]</span>
+    <span class="c1"># planet radius (in units of stellar radii)</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">rp</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;rp&quot;</span><span class="p">]</span>
+    <span class="c1"># semi-major axis (in units of stellar radii)</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span>
+    <span class="c1"># orbital inclination (in degrees)</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">inc</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;inc&quot;</span><span class="p">]</span>
+    <span class="c1"># eccentricity</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">ecc</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;ecc&quot;</span><span class="p">]</span>
+    <span class="c1"># longitude of periastron (in degrees)</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">]</span>
+    <span class="c1"># transit time between point 1 and 4 in hours</span>
+    <span class="n">t14h</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;t14h&quot;</span><span class="p">]</span>
+    <span class="c1"># transit time in days</span>
+    <span class="n">t14d</span> <span class="o">=</span> <span class="n">t14h</span> <span class="o">/</span> <span class="mi">24</span>
+    <span class="c1"># limb darkening model</span>
+    <span class="n">csv_profile_name</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;limb_dark&quot;</span><span class="p">]</span>
+    <span class="c1"># Correction in case of square root name</span>
+    <span class="n">limb_profile</span> <span class="o">=</span> <span class="s2">&quot;squareroot&quot;</span> <span class="k">if</span> <span class="p">(</span>
+            <span class="n">csv_profile_name</span> <span class="o">==</span> <span class="s2">&quot;square-root&quot;</span>
+    <span class="p">)</span> <span class="k">else</span> <span class="n">csv_profile_name</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">limb_dark</span> <span class="o">=</span> <span class="n">limb_profile</span>
+    <span class="c1"># Coefficients limb darkening</span>
+    <span class="n">file_limb_dark</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+        <span class="n">input_folder_path</span><span class="p">,</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;file_limb_dark&quot;</span><span class="p">]</span>
+    <span class="p">))</span>
+    <span class="n">limb_dark_coeff</span> <span class="o">=</span> <span class="n">load_limb_coeff</span><span class="p">(</span>
+        <span class="n">file_limb_dark</span><span class="p">,</span> <span class="n">csv_profile_name</span>
+    <span class="p">)</span>
+    <span class="c1"># limb darkening coefficients</span>
+    <span class="c1"># In this way they could be from 1 to 4</span>
+    <span class="c1"># depending on the method</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">limb_dark_coeff</span><span class="p">[</span><span class="o">~</span><span class="n">isnan</span><span class="p">(</span><span class="n">limb_dark_coeff</span><span class="p">)]</span>
+    <span class="n">limit_transit</span> <span class="o">=</span> <span class="n">t14d</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">t14d</span>
+    <span class="c1"># times at which to calculate light curve (days)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">limit_transit</span><span class="p">,</span> <span class="n">limit_transit</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
+    <span class="c1"># initializes model</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="c1"># calculates light curve</span>
+    <span class="n">flux</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">light_curve</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="c1"># Plot the figure</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time from central transit&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Relative flux&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+        <span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot; light curve with &quot;</span> <span class="o">+</span> <span class="n">limb_profile</span> <span class="o">+</span>
+        <span class="s2">&quot; limb darkening approximation&quot;</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+        <span class="n">output_folder_path</span><span class="p">,</span>
+        <span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">limb_profile</span> <span class="o">+</span> <span class="s2">&quot;_assignment1_taskF.png&quot;</span>
+    <span class="p">)))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francesco Amadori, Paula Manuela Leguizamon Pineda, Leonardo Dal Cin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

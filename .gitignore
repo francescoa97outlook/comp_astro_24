@@ -71,7 +71,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+# docs/_build/
 
 # PyBuilder
 .pybuilder/
@@ -176,4 +176,3 @@ Data/assignment2/*
 !Data/assignment2/.gitkeep
 Data/assignment3/*
 !Data/assignment3/.gitkeep
-!/docs/
