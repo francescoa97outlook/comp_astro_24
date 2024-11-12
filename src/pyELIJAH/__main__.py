@@ -6,9 +6,34 @@ from pyELIJAH.parameters.parameters import Parameters
 from pyELIJAH.detection.transit.transit_yaml import transit_yaml
 
 
-# Function that is called at the beginning
-# or directly from pyELIJAH command
 def main():
+    """
+    Function that is called at the beginning
+    or directly from pyELIJAH command.
+    If this function is called by pyELIJAH command,
+    the user can choose between different argument to
+    be passed.
+    - pyELIJAH -h, --help: shows the help message
+    - pyELIJAH -i INPUT_FILE, --input INPUT_FILE:
+      input par file to pass (a yaml file)
+    - pyELIJAH -t, --transit: select the transit method
+    - pyELIJAH -limbd DIRECTORY_LIMB, --directory_limb DIRECTORY_LIMB:
+      directory of the limb darkening file (or others).
+      If the user wants to set another folder to get their input data, use this option.
+      In this case, just put the absolute path of the folder. Otherwise, put
+      their data inside the Data folder (default one) and do not use this option.
+    - pyELIJAH -res DIRECTORY_RESULTS, --directory_results DIRECTORY_RESULTS:
+      directory where to store the results.
+      If the user wants to set another folder to store their output data, use this option.
+      In this case, just put the absolute path of the folder. Otherwise, the output
+      will be stored in the Results folder.
+    - pyELIJAH -d, --detect: initialise detection algorithms for Exoplanets
+    - pyELIJAH -a, --atmosphere: atmospheric characterisation from input transmission spectrum
+    Args:
+
+    Returns:
+
+    """
     # Create a ArgumentParser object to work
     # with script argument
     parser = argparse.ArgumentParser()
@@ -84,7 +109,7 @@ def main():
         "--atmosphere",
         dest="atmosphere",
         required=False,
-        help="Atmospheric Characterisazion from "
+        help="Atmospheric Characterisation from "
              "input transmission spectrum",
         action="store_true",
     )
@@ -150,7 +175,9 @@ def main():
     print(f"pyELIJAH finishes at {finish}")
 
 
-# Main function that will be executed by
-# launching normally the script
+"""
+    Main function that will be executed by
+    launching normally the script
+"""
 if __name__ == "__main__":
     main()

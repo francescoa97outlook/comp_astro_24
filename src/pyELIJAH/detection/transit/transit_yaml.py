@@ -7,9 +7,24 @@ import matplotlib.pyplot as plt
 matplotlib.use('Qt5Agg')
 
 
-# This function return the coefficients for the
-# parametrization of the limb darkening
+#
+
 def load_limb_coeff(limb_dark_path, profile):
+    """
+    This function return the coefficients for the parametrization
+    of the limb darkening
+
+    Args:
+        limb_dark_path:
+            string containing the path to the limb darkening
+            csv file produced by https://exoctk.stsci.edu/limb_darkening
+        profile:
+            string containing the name of the profile. Possible values:
+            ["quadratic", "exponential", "linear", logarithmic", "square-root"]
+
+    Return:
+        an array containing the mean of at maximum 4 limb darkening coefficients
+    """
     # Storing the file information into a dataframe
     df = read_csv(limb_dark_path, sep='\s+')
     # Filtering the dataframe to obtain only
@@ -23,9 +38,24 @@ def load_limb_coeff(limb_dark_path, profile):
     return array([mean_c1, mean_c2, mean_c3, mean_c4])
 
 
-# Function that calculate the light curve
 # using batman package
 def transit_yaml(yaml_params, output_folder_path, input_folder_path):
+    """
+        This function calculates the light curve of the transit
+
+        Args:
+            yaml_params:
+                object of Parameters class containing the keys and values
+                of the stored in the yaml file
+            output_folder_path:
+                string containing the path to the output folder, where to save results
+            input_folder_path:
+                string containing the path to the input folder, where to retrieve
+                the files needed for the algorithm
+
+        Return:
+            an array containing the mean of at maximum 4 limb darkening coefficients
+        """
     planet_name = yaml_params["planet_name"]
     # object to store transit parameters
     params = batman.TransitParams()

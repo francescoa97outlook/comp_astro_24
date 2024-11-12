@@ -7,9 +7,20 @@ import matplotlib.pyplot as plt
 matplotlib.use('Qt5Agg')
 
 
-# This function return the coefficients for the
-# quadratic parametrization of the limb darkening
 def load_limb_coeff(limb_dark_path):
+    """
+        This function return the coefficients for the parametrization
+        of the limb darkening
+
+        Args:
+            limb_dark_path:
+                string containing the path to the limb darkening
+                csv file produced by https://exoctk.stsci.edu/limb_darkening
+
+        Return:
+            an array containing the mean of the two coefficients and related
+            errors of the quadratic limb darkening parametrization
+        """
     # Storing the file information into a dataframe
     df = read_csv(limb_dark_path, sep='\s+')
     # Filtering the dataframe to obtain only
