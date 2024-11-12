@@ -23,6 +23,7 @@ dependencies = [
     "pyqt5",
     "pandas",
     "sphinx",
+    "sphinx_rtd_theme",
     "pillow",
     "numpy==1.24.3",
 ]
