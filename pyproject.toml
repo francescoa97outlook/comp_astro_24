@@ -25,7 +25,7 @@ dependencies = [
     "sphinx",
     "sphinx_rtd_theme",
     "pillow",
-    "numpy==1.24.3",
+    "numpy==1.26.4",
 ]
 
 
