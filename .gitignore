@@ -163,16 +163,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-Results/assignment1/*
-!Results/assignment1/.gitkeep
-Results/assignment2/*
-!Results/assignment2/.gitkeep
-Results/assignment3/*
-!Results/assignment3/.gitkeep
+Results/*
+!Results/.gitkeep
 
-Data/assignment1/*
-!Data/assignment1/.gitkeep
-Data/assignment2/*
-!Data/assignment2/.gitkeep
-Data/assignment3/*
-!Data/assignment3/.gitkeep
+Data/*
+!Data/.gitkeep

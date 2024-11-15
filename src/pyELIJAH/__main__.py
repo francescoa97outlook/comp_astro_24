@@ -2,6 +2,8 @@ import datetime
 import argparse
 from pathlib import Path
 
+import numpy as np
+
 from pyELIJAH.parameters.parameters import Parameters
 from pyELIJAH.detection.transit.transit_yaml import transit_yaml
 
@@ -13,22 +15,25 @@ def main():
     If this function is called by pyELIJAH command,
     the user can choose between different argument to
     be passed.
-    - pyELIJAH -h, --help: shows the help message
-    - pyELIJAH -i INPUT_FILE, --input INPUT_FILE:
-      input par file to pass (a yaml file)
-    - pyELIJAH -t, --transit: select the transit method
-    - pyELIJAH -limbd DIRECTORY_LIMB, --directory_limb DIRECTORY_LIMB:
-      directory of the limb darkening file (or others).
+    - pyelijah -h, --help: shows the help message
+    - pyelijah -i INPUT_FILE, --input INPUT_FILE:
+      input list file to pass as argument (a txt file containing the list of yaml
+      files, each one in a row)
+    - pyelijah -t, --transit: select the transit method
+    - pyelijah -id DIRECTORY_INPUT, --directory_input DIRECTORY_INPUT:
+      Directory of the input files (yaml, limb darkening...).
       If the user wants to set another folder to get their input data, use this option.
       In this case, just put the absolute path of the folder. Otherwise, put
       their data inside the Data folder (default one) and do not use this option.
-    - pyELIJAH -res DIRECTORY_RESULTS, --directory_results DIRECTORY_RESULTS:
+    - pyelijah -res DIRECTORY_RESULTS, --directory_results DIRECTORY_RESULTS:
       directory where to store the results.
       If the user wants to set another folder to store their output data, use this option.
       In this case, just put the absolute path of the folder. Otherwise, the output
       will be stored in the Results folder.
-    - pyELIJAH -d, --detect: initialise detection algorithms for Exoplanets
-    - pyELIJAH -a, --atmosphere: atmospheric characterisation from input transmission spectrum
+    - pyelijah -multi, --multi_plot: flag to plot all planets information singularly
+
+    - pyelijah -d, --detect: initialise detection algorithms for Exoplanets
+    - pyelijah -a, --atmosphere: atmospheric characterisation from input transmission spectrum
     Args:
 
     Returns:
@@ -46,7 +51,8 @@ def main():
         dest="input_file",
         type=str,
         required=True,
-        help="Input par file to pass",
+        help="input list file to pass as argument (a txt file containing the list of planets, "
+             "each one in a row)",
     )
     # Define an expected command -t.
     # It is not required and will be used with key transit
@@ -59,17 +65,17 @@ def main():
         help="Select the transit method",
         action="store_true",
     )
-    # Define an expected input folder with command -limbd.
+    # Define an expected input folder with command -id.
     # It must be a string (str) and is not required.
-    # It will be used in the code with the key directory_limb
+    # It will be used in the code with the key directory_input
     parser.add_argument(
-        "-limbd",
-        "--directory_limb",
-        dest="directory_limb",
+        "-id",
+        "--input_directory",
+        dest="directory_input",
         type=str,
         required=False,
         help="""
-        Directory of the limb darkening file (or others). 
+        Directory of the input files (yaml, limb darkening...). 
         If you want to set another folder to get your 
         input data, use this option. In this case,  
         just put the absolute path of the folder.  
@@ -113,6 +119,17 @@ def main():
              "input transmission spectrum",
         action="store_true",
     )
+    # Define an expected command -single.
+    # It is not required and will be used with key multi_plot
+    # to plot all planets information singularly
+    parser.add_argument(
+        "-multi",
+        "--multi_plot",
+        dest="multi_plot",
+        required=False,
+        help="Flag to plot all planets information singularly",
+        action="store_true",
+    )
     # This command will parse (convert) the arguments
     # with the respective expected commands.
     args = parser.parse_args()
@@ -123,23 +140,32 @@ def main():
     start = datetime.datetime.now()
     print(f"pyELIJAH starts at {start}")
     # Define the required input folder in which are retrieved
-    # the planets parameters
-    input_params = Parameters(args.input_file).params
+    # the planets files
+    input_list_files = args.input_file
+    list_files = np.genfromtxt(input_list_files, dtype=str)
     # This is defined to establish the input folder
-    # If the -limbd param is set, the path will be the one
+    # If the -id param is set, the path will be the one
     # defined from the argument.
     # If not, it will be the default path
-    if args.directory_limb:
+    if args.directory_input:
         input_folder_path_light_curve = str(Path(
-            args.directory_limb
+            args.directory_input
         ))
     else:
         input_folder_path_light_curve = str(Path(
             path_default.replace(
                 str(Path("src", "pyELIJAH")), ""
             ),
-            "Data", "assignment1",
+            "Data",
         ))
+    # Retrieve multi arguments
+    multi = args.multi_plot
+    #
+    param_obj_list = list()
+    for file_planet in list_files:
+        param_obj_list.append(
+            Parameters(Path(input_folder_path_light_curve, file_planet)).params
+        )
     # This is defined to establish the output folder
     # If the -res param is set, the path will be the one
     # defined from the argument.
@@ -153,7 +179,7 @@ def main():
             path_default.replace(
                 str(Path("src", "pyELIJAH")), ""
             ),
-            "Results", "assignment1",
+            "Results",
         ))
     #
     if args.detect:
@@ -167,8 +193,8 @@ def main():
     if args.transit:
         # call the transit.py file
         transit_yaml(
-            input_params, output_folder_path_light_curve,
-            input_folder_path_light_curve
+            param_obj_list, output_folder_path_light_curve,
+            input_folder_path_light_curve, multi
         )
     # End of the program
     finish = datetime.datetime.now()

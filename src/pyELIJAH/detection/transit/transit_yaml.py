@@ -11,7 +11,7 @@ matplotlib.use('Qt5Agg')
 
 def load_limb_coeff(limb_dark_path, profile):
     """
-    This function return the coefficients for the parametrization
+    This function returns the coefficients for the parametrization
     of the limb darkening
 
     Args:
@@ -23,7 +23,7 @@ def load_limb_coeff(limb_dark_path, profile):
             ["quadratic", "exponential", "linear", logarithmic", "square-root"]
 
     Return:
-        an array containing the mean of at maximum 4 limb darkening coefficients
+        an array containing the mean values of each limb darkening coefficients
     """
     # Storing the file information into a dataframe
     df = read_csv(limb_dark_path, sep='\s+')
@@ -39,79 +39,97 @@ def load_limb_coeff(limb_dark_path, profile):
 
 
 # using batman package
-def transit_yaml(yaml_params, output_folder_path, input_folder_path):
+def transit_yaml(param_obj_list, output_folder_path, input_folder_path, multi):
     """
-        This function calculates the light curve of the transit
+        This function calculates the transit light curves of the selected planets
 
         Args:
-            yaml_params:
-                object of Parameters class containing the keys and values
-                of the stored in the yaml file
+            param_obj_list:
+                list of objects of Parameters class containing the keys and values
+                of the chosen planets
             output_folder_path:
-                string containing the path to the output folder, where to save results
+                string containing the output folder path where the results are saved
             input_folder_path:
-                string containing the path to the input folder, where to retrieve
-                the files needed for the algorithm
+                string containing the input folder path where the files needed for the
+                algorithm are retrieved
+            multi:
+                flag to plot all planets light curves as single figures
 
         Return:
-            an array containing the mean of at maximum 4 limb darkening coefficients
+
         """
-    planet_name = yaml_params["planet_name"]
-    # object to store transit parameters
-    params = batman.TransitParams()
-    # time of inferior conjunction
-    params.t0 = yaml_params["t0"]
-    # orbital period (in days)
-    params.per = yaml_params["per"]
-    # planet radius (in units of stellar radii)
-    params.rp = yaml_params["rp"]
-    # semi-major axis (in units of stellar radii)
-    params.a = yaml_params["a"]
-    # orbital inclination (in degrees)
-    params.inc = yaml_params["inc"]
-    # eccentricity
-    params.ecc = yaml_params["ecc"]
-    # longitude of periastron (in degrees)
-    params.w = yaml_params["w"]
-    # transit time between point 1 and 4 in hours
-    t14h = yaml_params["t14h"]
-    # transit time in days
-    t14d = t14h / 24
-    # limb darkening model
-    csv_profile_name = yaml_params["limb_dark"]
-    # Correction in case of square root name
-    limb_profile = "squareroot" if (
-            csv_profile_name == "square-root"
-    ) else csv_profile_name
-    params.limb_dark = limb_profile
-    # Coefficients limb darkening
-    file_limb_dark = str(Path(
-        input_folder_path, yaml_params["file_limb_dark"]
-    ))
-    limb_dark_coeff = load_limb_coeff(
-        file_limb_dark, csv_profile_name
-    )
-    # limb darkening coefficients
-    # In this way they could be from 1 to 4
-    # depending on the method
-    params.u = limb_dark_coeff[~isnan(limb_dark_coeff)]
-    limit_transit = t14d / 2 + 0.3 * t14d
-    # times at which to calculate light curve (days)
-    t = linspace(-limit_transit, limit_transit, 5000)
-    # initializes model
-    m = batman.TransitModel(params, t)
-    # calculates light curve
-    flux = m.light_curve(params)
-    # Plot the figure
-    plt.plot(t, flux)
-    plt.xlabel("Time from central transit")
-    plt.ylabel("Relative flux")
-    plt.title(
-        planet_name + " light curve with " + limb_profile +
-        " limb darkening approximation"
-    )
+    fig_single, ax_single = plt.subplots(1, 1, figsize=(10, 8))
+    for yaml_params in param_obj_list:
+        planet_name = yaml_params.get("planet_name")
+        # object to store transit parameters
+        params = batman.TransitParams()
+        # time of inferior conjunction
+        params.t0 = yaml_params.get("t0")
+        # orbital period (in days)
+        params.per = yaml_params.get("per")
+        # planet radius (in units of stellar radii)
+        params.rp = yaml_params.get("rp")
+        # semi-major axis (in units of stellar radii)
+        params.a = yaml_params.get("a")
+        # orbital inclination (in degrees)
+        params.inc = yaml_params.get("inc")
+        # eccentricity
+        params.ecc = yaml_params.get("ecc")
+        # longitude of periastron (in degrees)
+        params.w = yaml_params.get("w")
+        # transit time between point 1 and 4 in hours
+        t14h = yaml_params.get("t14h")
+        # transit time in days
+        t14d = t14h / 24
+        # limb darkening model
+        csv_profile_name = yaml_params.get("limb_dark")
+        # Correction in case of square root name
+        limb_profile = "squareroot" if (
+                csv_profile_name == "square-root"
+        ) else csv_profile_name
+        params.limb_dark = limb_profile
+        # Coefficients limb darkening
+        file_limb_dark = str(Path(
+            input_folder_path, yaml_params.get("file_limb_dark")
+        ))
+        limb_dark_coeff = load_limb_coeff(
+            file_limb_dark, csv_profile_name
+        )
+        # limb darkening coefficients
+        # In this way they could be from 1 to 4
+        # depending on the method
+        params.u = limb_dark_coeff[~isnan(limb_dark_coeff)]
+        limit_transit = t14d / 2 + 0.3 * t14d
+        # times at which to calculate light curve (days)
+        t = linspace(-limit_transit + params.t0, limit_transit + params.t0, 5000)
+        # initializes model
+        m = batman.TransitModel(params, t)
+        # calculates light curve
+        flux = m.light_curve(params)
+        # Plot the figure of the single planet
+        if multi:
+            fig_multi, ax_multi = plt.subplots(1, 1, figsize=(10, 8))
+            ax_multi.plot(t, flux)
+            ax_multi.set_xlabel("Time from central transit [days]")
+            ax_multi.set_ylabel("Relative flux")
+            ax_multi.set_title(
+                planet_name + " light curve with " + limb_profile +
+                " limb darkening approximation"
+            )
+            plt.savefig(str(Path(
+                output_folder_path,
+                planet_name + "_" + limb_profile + ".png"
+            )))
+            plt.close(fig_multi)
+        #
+        ax_single.plot(t, flux, label=planet_name + ", " + limb_profile)
+    # Plot all the planets
+    ax_single.set_xlabel("Time from central transit [days]")
+    ax_single.set_ylabel("Relative flux")
+    ax_single.set_title("Light curves")
+    ax_single.legend(loc='lower right')
     plt.savefig(str(Path(
-        output_folder_path,
-        planet_name + "_" + limb_profile + "_assignment1_taskF.png"
+        output_folder_path, "planets_light_curves.png"
     )))
     plt.show()
+    plt.close(fig_single)
