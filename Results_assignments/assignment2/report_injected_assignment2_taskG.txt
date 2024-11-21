@@ -1,0 +1,737 @@
+
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 1
+Number of neurons: 128
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.4806369176331826
+Dev set error: 0.4491228070175438
+------------
+Precision_train: 0.596564531104921
+Precision_dev: 0.5592885375494071
+------------
+Confusion_matrix_train:
+[[1357  869]
+ [1576 1285]]
+Confusion_matrix_dev:
+[[ 31 223]
+ [ 33 283]]
+------------
+Train Set Positive Predictions: 2154
+Dev Set Positive Predictions: 506
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 1
+Number of neurons: 128
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.4653037153528602
+Dev set error: 0.4403508771929825
+------------
+Precision_train: 0.5906089508437271
+Precision_dev: 0.5605214152700186
+------------
+Confusion_matrix_train:
+[[1110 1116]
+ [1251 1610]]
+Confusion_matrix_dev:
+[[ 18 236]
+ [ 15 301]]
+------------
+Train Set Positive Predictions: 2726
+Dev Set Positive Predictions: 537
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 1
+Number of neurons: 64
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.46884214664831925
+Dev set error: 0.5228070175438597
+------------
+Precision_train: 0.6319290465631929
+Precision_dev: 0.5517241379310345
+------------
+Confusion_matrix_train:
+[[1562  664]
+ [1721 1140]]
+Confusion_matrix_dev:
+[[176  78]
+ [220  96]]
+------------
+Train Set Positive Predictions: 1804
+Dev Set Positive Predictions: 174
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 1
+Number of neurons: 64
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.48004717908393946
+Dev set error: 0.5175438596491229
+------------
+Precision_train: 0.6249254621347644
+Precision_dev: 0.5538461538461539
+------------
+Confusion_matrix_train:
+[[1597  629]
+ [1813 1048]]
+Confusion_matrix_dev:
+[[167  87]
+ [208 108]]
+------------
+Train Set Positive Predictions: 1677
+Dev Set Positive Predictions: 195
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 1
+Number of neurons: 32
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.44603892274425005
+Dev set error: 0.5
+------------
+Precision_train: 0.6203252032520326
+Precision_dev: 0.5511551155115512
+------------
+Confusion_matrix_train:
+[[1292  934]
+ [1335 1526]]
+Confusion_matrix_dev:
+[[118 136]
+ [149 167]]
+------------
+Train Set Positive Predictions: 2460
+Dev Set Positive Predictions: 303
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 1
+Number of neurons: 32
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.4979359150776489
+Dev set error: 0.5456140350877192
+------------
+Precision_train: 0.6168091168091168
+Precision_dev: 0.6
+------------
+Confusion_matrix_train:
+[[1688  538]
+ [1995  866]]
+Confusion_matrix_dev:
+[[244  10]
+ [301  15]]
+------------
+Train Set Positive Predictions: 1404
+Dev Set Positive Predictions: 25
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 1
+Number of neurons: 1
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.4478081383919795
+Dev set error: 0.4491228070175438
+------------
+Precision_train: 0.5843216661845531
+Precision_dev: 0.5528169014084507
+------------
+Confusion_matrix_train:
+[[ 789 1437]
+ [ 841 2020]]
+Confusion_matrix_dev:
+[[  0 254]
+ [  2 314]]
+------------
+Train Set Positive Predictions: 3457
+Dev Set Positive Predictions: 568
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 1
+Number of neurons: 1
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.44859445645763707
+Dev set error: 0.4631578947368421
+------------
+Precision_train: 0.5771794188216476
+Precision_dev: 0.5634146341463414
+------------
+Confusion_matrix_train:
+[[ 640 1586]
+ [ 696 2165]]
+Confusion_matrix_dev:
+[[ 75 179]
+ [ 85 231]]
+------------
+Train Set Positive Predictions: 3751
+Dev Set Positive Predictions: 410
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 4
+Number of neurons: 128
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.5274228425398073
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.6692015209125475
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2052  174]
+ [2509  352]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 526
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 4
+Number of neurons: 128
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 4
+Number of neurons: 64
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.5250638883428347
+Dev set error: 0.5526315789473684
+------------
+Precision_train: 0.7188940092165899
+Precision_dev: 0.5555555555555556
+------------
+Confusion_matrix_train:
+[[2104  122]
+ [2549  312]]
+Confusion_matrix_dev:
+[[250   4]
+ [311   5]]
+------------
+Train Set Positive Predictions: 434
+Dev Set Positive Predictions: 9
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 4
+Number of neurons: 64
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 4
+Number of neurons: 32
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.49970513072537837
+Dev set error: 0.5385964912280702
+------------
+Precision_train: 0.6243180046765393
+Precision_dev: 0.5517241379310345
+------------
+Confusion_matrix_train:
+[[1744  482]
+ [2060  801]]
+Confusion_matrix_dev:
+[[215  39]
+ [268  48]]
+------------
+Train Set Positive Predictions: 1283
+Dev Set Positive Predictions: 87
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 4
+Number of neurons: 32
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5569097700019658
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.868421052631579
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2221    5]
+ [2828   33]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 38
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 4
+Number of neurons: 1
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.43758600353843125
+Dev set error: 0.44561403508771935
+------------
+Precision_train: 0.5624139964615688
+Precision_dev: 0.5543859649122806
+------------
+Confusion_matrix_train:
+[[   0 2226]
+ [   0 2861]]
+Confusion_matrix_dev:
+[[  0 254]
+ [  0 316]]
+------------
+Train Set Positive Predictions: 5087
+Dev Set Positive Predictions: 570
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 4
+Number of neurons: 1
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 12
+Number of neurons: 128
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.5547473953214075
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.7910447761194029
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2212   14]
+ [2808   53]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 67
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 12
+Number of neurons: 128
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 12
+Number of neurons: 64
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.5400039315903282
+Dev set error: 0.5456140350877192
+------------
+Precision_train: 0.6266666666666667
+Precision_dev: 0.5263157894736842
+------------
+Confusion_matrix_train:
+[[2058  168]
+ [2579  282]]
+Confusion_matrix_dev:
+[[209  45]
+ [266  50]]
+------------
+Train Set Positive Predictions: 450
+Dev Set Positive Predictions: 95
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 12
+Number of neurons: 64
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 12
+Number of neurons: 32
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.552978179673678
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.8076923076923077
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2211   15]
+ [2798   63]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 78
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 12
+Number of neurons: 32
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 12
+Number of neurons: 1
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.43758600353843125
+Dev set error: 0.44561403508771935
+------------
+Precision_train: 0.5624139964615688
+Precision_dev: 0.5543859649122806
+------------
+Confusion_matrix_train:
+[[   0 2226]
+ [   0 2861]]
+Confusion_matrix_dev:
+[[  0 254]
+ [  0 316]]
+------------
+Train Set Positive Predictions: 5087
+Dev Set Positive Predictions: 570
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 12
+Number of neurons: 1
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.43758600353843125
+Dev set error: 0.44561403508771935
+------------
+Precision_train: 0.5624139964615688
+Precision_dev: 0.5543859649122806
+------------
+Confusion_matrix_train:
+[[   0 2226]
+ [   0 2861]]
+Confusion_matrix_dev:
+[[  0 254]
+ [  0 316]]
+------------
+Train Set Positive Predictions: 5087
+Dev Set Positive Predictions: 570
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 64
+Number of neurons: 128
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.43758600353843125
+Dev set error: 0.44561403508771935
+------------
+Precision_train: 0.5624139964615688
+Precision_dev: 0.5543859649122806
+------------
+Confusion_matrix_train:
+[[   0 2226]
+ [   0 2861]]
+Confusion_matrix_dev:
+[[  0 254]
+ [  0 316]]
+------------
+Train Set Positive Predictions: 5087
+Dev Set Positive Predictions: 570
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 64
+Number of neurons: 128
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 64
+Number of neurons: 64
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.43758600353843125
+Dev set error: 0.44561403508771935
+------------
+Precision_train: 0.5624139964615688
+Precision_dev: 0.5543859649122806
+------------
+Confusion_matrix_train:
+[[   0 2226]
+ [   0 2861]]
+Confusion_matrix_dev:
+[[  0 254]
+ [  0 316]]
+------------
+Train Set Positive Predictions: 5087
+Dev Set Positive Predictions: 570
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 64
+Number of neurons: 64
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 64
+Number of neurons: 32
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 64
+Number of neurons: 32
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.43758600353843125
+Dev set error: 0.44561403508771935
+------------
+Precision_train: 0.5624139964615688
+Precision_dev: 0.5543859649122806
+------------
+Confusion_matrix_train:
+[[   0 2226]
+ [   0 2861]]
+Confusion_matrix_dev:
+[[  0 254]
+ [  0 316]]
+------------
+Train Set Positive Predictions: 5087
+Dev Set Positive Predictions: 570
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 64
+Number of neurons: 1
+Dropout rate: 0.2
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
+
+--------------------------------------
+Dataset: Injection
+Number of dense and dropout layers: 64
+Number of neurons: 1
+Dropout rate: 0.5
+--------------------------------------
+Train set error: 0.5624139964615686
+Dev set error: 0.5543859649122806
+------------
+Precision_train: 0.0
+Precision_dev: 0.0
+------------
+Confusion_matrix_train:
+[[2226    0]
+ [2861    0]]
+Confusion_matrix_dev:
+[[254   0]
+ [316   0]]
+------------
+Train Set Positive Predictions: 0
+Dev Set Positive Predictions: 0
+------------
