@@ -1,0 +1,61 @@
+Model - linear
+------------
+Train Set Error 0.0
+Dev Set Error 0.00877192982456143
+------------
+Precision - Train Set 1.0
+Precision - Dev Set 0.0
+------------
+Recall - Train Set 1.0
+Recall - Dev Set 0.0
+------------
+Confusion Matrix - Train Set
+[[5050    0]
+ [   0   37]]
+Confusion Matrix - Dev Set
+[[565   0]
+ [  5   0]]
+------------
+
+
+ 
+Model - rbf
+------------
+Train Set Error 0.00019657951641438576
+Dev Set Error 0.00877192982456143
+------------
+Precision - Train Set 1.0
+Precision - Dev Set 0.0
+------------
+Recall - Train Set 0.972972972972973
+Recall - Dev Set 0.0
+------------
+Confusion Matrix - Train Set
+[[5050    0]
+ [   1   36]]
+Confusion Matrix - Dev Set
+[[565   0]
+ [  5   0]]
+------------
+
+
+
+Model - poly (degree 4)
+------------
+Train Set Error 0.0
+Dev Set Error 0.019298245614035037
+------------
+Precision - Train Set 1.0
+Precision - Dev Set 0.0
+------------
+Recall - Train Set 1.0
+Recall - Dev Set 0.0
+------------
+Confusion Matrix - Train Set
+[[5050    0]
+ [   0   37]]
+Confusion Matrix - Dev Set
+[[559   6]
+ [  5   0]]
+------------
+
