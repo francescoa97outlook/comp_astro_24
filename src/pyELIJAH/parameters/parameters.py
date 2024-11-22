@@ -30,4 +30,7 @@ class Parameters:
         Returns:
             Value of the parameter key
         """
-        return self.params[param]
+        if param in self.params.keys():
+            return self.params[param]
+        else:
+            return None
