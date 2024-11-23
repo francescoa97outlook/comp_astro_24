@@ -11,7 +11,7 @@ def fourier_transform(X):
     Args:
         X: array to apply Fourier transform
     """
-    return abs(fft.fft(X, n=X.size))
+    return abs(fft.fft(X.values, n=X.size))
 
 
 class LightFluxProcessor:
