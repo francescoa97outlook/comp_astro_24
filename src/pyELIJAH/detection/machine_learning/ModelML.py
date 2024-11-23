@@ -104,11 +104,11 @@ class ModelML:
             - CNN, using tensorflow CNN https://www.tensorflow.org/tutorials/images/cnn
         """
         # Model uses support vector machine algorithm
-        if self.ML_type == "SVM":
+        if self.ML_type == "svm":
             # Model creation using the SVC function
             self.model = SVC(kernel=self.kernel, degree=self.degree_poly)
         # Model uses neural networks algorithm
-        elif self.ML_type == "NN":
+        elif self.ML_type == "nn":
             # Creation of the model
             self.model = tf.keras.models.Sequential()
             # Add input layer large as the size of the input data
@@ -126,7 +126,7 @@ class ModelML:
             # Model compilation
             self.model.compile(optimizer="adam", loss=loss_fn, metrics=["accuracy"])
         # Model uses convoluted neural networks algorithm
-        elif self.ML_type == "CNN":
+        elif self.ML_type == "cnn":
             print("TODO")
         # The model does not exist
         else:
@@ -134,20 +134,19 @@ class ModelML:
             self.proceed_with_model = False
             self.model = None
 
-    def train(self, X, Y, render_plot=False):
+    def train(self, X, Y):
         """
         This function trains the model
 
         Args:
             X: array of elements used to train the model
             Y: labels of the training data
-            render_plot: whether to render plot or not
         """
         # If the model does not exist, end function
         if not self.proceed_with_model:
             return
         # SVM model training
-        if self.ML_type == "SVM":
+        if self.ML_type == "svm":
             # Train model
             self.model.fit(X, Y)
         # NN - CNN model training
@@ -158,28 +157,27 @@ class ModelML:
             # Train model
             history = self.model.fit(X, Y.ravel(), epochs=self.epoch, batch_size=self.batch_size)
             # Plot accuracy of the model
-            if render_plot:
-                output_plot = str(Path(self.output_folder, f"plot_{self.ML_type}_{self.current_datetime}.png"))
-                fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), layout="constrained")
-                plot_title = f"\nLayers: {self.n_hidden_layers}, neurons: {self.n_neurons}, Dropout rate: {self.dropout_rate}"
-                fig.suptitle(plot_title)
-                # list all data in history
-                print(history.history.keys())
-                # summarize history for accuracy
-                ax1.plot(history.history["accuracy"])
-                ax1.set_title("Model Accuracy")
-                ax1.set_ylabel("Accuracy")
-                ax1.set_xlabel("Epoch")
-                ax1.legend(["train", "test"], loc="upper left")
-                #
-                # summarize history for loss
-                ax2.plot(history.history["loss"])
-                ax2.set_title("Model Loss")
-                ax2.set_ylabel("loss")
-                ax2.set_xlabel("epoch")
-                ax2.legend(["train", "test"], loc="upper left")
-                plt.savefig(output_plot)
-                plt.close(fig)
+            output_plot = str(Path(self.output_folder, f"plot_{self.ML_type}_{self.current_datetime}.png"))
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), layout="constrained")
+            plot_title = f"\nLayers: {self.n_hidden_layers}, neurons: {self.n_neurons}, Dropout rate: {self.dropout_rate}"
+            fig.suptitle(plot_title)
+            # list all data in history
+            print(history.history.keys())
+            # summarize history for accuracy
+            ax1.plot(history.history["accuracy"])
+            ax1.set_title("Model Accuracy")
+            ax1.set_ylabel("Accuracy")
+            ax1.set_xlabel("Epoch")
+            ax1.legend(["train", "test"], loc="upper left")
+            #
+            # summarize history for loss
+            ax2.plot(history.history["loss"])
+            ax2.set_title("Model Loss")
+            ax2.set_ylabel("loss")
+            ax2.set_xlabel("epoch")
+            ax2.legend(["train", "test"], loc="upper left")
+            plt.savefig(output_plot)
+            plt.close(fig)
 
     def predict(self, X, Y_results=None):
         """
@@ -198,7 +196,7 @@ class ModelML:
             f"\n{self.ML_type} model"
         )
         # Predict of the data for SVM model
-        if self.ML_type == "SVM":
+        if self.ML_type == "svm":
             predicted = self.model.predict(X)
             log_temp += (
                 f"\n--------------------------------------"

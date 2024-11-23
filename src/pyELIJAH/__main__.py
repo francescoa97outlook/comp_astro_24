@@ -2,10 +2,9 @@ import datetime
 import argparse
 from pathlib import Path
 
-import numpy as np
-
 from pyELIJAH.parameters.parameters import Parameters
 from pyELIJAH.detection.transit.transit_yaml import transit_yaml
+from pyELIJAH.detection.machine_learning.machine_learning_yaml import machine_learning
 
 
 def main():
@@ -31,8 +30,11 @@ def main():
       In this case, just put the absolute path of the folder. Otherwise, the output
       will be stored in the Results folder.
     - pyelijah -multi, --multi_plot: flag to plot all planets information singularly
-
-    - pyelijah -d, --detect: initialise detection algorithms for Exoplanets
+    - pyelijah -d, --detect: Command that is used to accept a limited set of strings
+      concerning the machine learning algorithm used to detect
+      exoplanets in a set of data.
+      The accepted values are: "svm" for support vector machine,
+      "nn" for neural network, "cnn" for convolutional neural network.
     - pyelijah -a, --atmosphere: atmospheric characterisation from input transmission spectrum
     Args:
 
@@ -54,6 +56,7 @@ def main():
         help="input list file to pass as argument (a txt file containing the list of planets, "
              "each one in a row)",
     )
+    # ---------------------------------- #
     # Define an expected command -t.
     # It is not required and will be used with key transit
     # to launch the script transit_yaml.py
@@ -65,6 +68,7 @@ def main():
         help="Select the transit method",
         action="store_true",
     )
+    # ---------------------------------- #
     # Define an expected input folder with command -id.
     # It must be a string (str) and is not required.
     # It will be used in the code with the key directory_input
@@ -83,6 +87,7 @@ def main():
         folder (default one) and do not use this option.
         """
     )
+    # ---------------------------------- #
     # Define an expected output folder with command -res.
     # It must be a string (str) and is not required.
     # It will be used in the code with the key directory_results
@@ -100,15 +105,25 @@ def main():
             the output will be stored in the Results folder.
             """
     )
-    #
+    # ---------------------------------- #
+    # Command that is used to accept a limited set of strings
+    # concerning the machine learning algorithm used to detect
+    # exoplanets in a set of data
     parser.add_argument(
         "-d",
         "--detect",
         dest="detect",
         required=False,
-        help="Initialise detection algorithms for Exoplanets",
-        action="store_true",
+        type=str,
+        help="""
+        Command that is used to accept a limited set of strings 
+        concerning the machine learning algorithm used to detect 
+        exoplanets in a set of data.
+        The accepted values are: "svm" for support vector machine, 
+        "nn" for neural network, "cnn" for convolutional neural network.
+        """,
     )
+    # ---------------------------------- #
     #
     parser.add_argument(
         "-a",
@@ -119,6 +134,7 @@ def main():
              "input transmission spectrum",
         action="store_true",
     )
+    # ---------------------------------- #
     # Define an expected command -single.
     # It is not required and will be used with key multi_plot
     # to plot all planets information singularly
@@ -130,6 +146,8 @@ def main():
         help="Flag to plot all planets information singularly",
         action="store_true",
     )
+    # ------------------------------------------------------------------------------- #
+    # ------------------------------------------------------------------------------- #
     # This command will parse (convert) the arguments
     # with the respective expected commands.
     args = parser.parse_args()
@@ -139,63 +157,91 @@ def main():
     # Launch pyELIJAH
     start = datetime.datetime.now()
     print(f"pyELIJAH starts at {start}")
-    # Define the required input folder in which are retrieved
-    # the planets files
-    input_list_files = args.input_file
-    list_files = np.genfromtxt(input_list_files, dtype=str)
+    # ------------------------------------------------------------------------------- #
+    # ------------------------------------------------------------------------------- #
     # This is defined to establish the input folder
     # If the -id param is set, the path will be the one
     # defined from the argument.
     # If not, it will be the default path
     if args.directory_input:
-        input_folder_path_light_curve = str(Path(
+        input_folder = str(Path(
             args.directory_input
         ))
     else:
-        input_folder_path_light_curve = str(Path(
+        input_folder = str(Path(
             path_default.replace(
-                str(Path("src", "pyELIJAH")), ""
+                str(Path("..", "pyELIJAH")), ""
             ),
-            "Data",
+            "../../Data",
         ))
-    # Retrieve multi arguments
-    multi = args.multi_plot
-    #
-    param_obj_list = list()
-    for file_planet in list_files:
-        param_obj_list.append(
-            Parameters(Path(input_folder_path_light_curve, file_planet)).params
-        )
+    # ---------------------------------- #
     # This is defined to establish the output folder
     # If the -res param is set, the path will be the one
     # defined from the argument.
     # If not, it will be the default path
     if args.directory_results:
-        output_folder_path_light_curve = str(Path(
+        output_folder = str(Path(
             args.directory_results
         ))
     else:
-        output_folder_path_light_curve = str(Path(
+        output_folder = str(Path(
             path_default.replace(
-                str(Path("src", "pyELIJAH")), ""
+                str(Path("..", "pyELIJAH")), ""
             ),
-            "Results",
+            "../../Results",
         ))
-    #
-    if args.detect:
-        pass
-    #
-    if args.atmosphere:
-        pass
+    # ---------------------------------- #
+    # Define the required input folder in which are retrieved
+    # the planets files
+    input_file = args.input_file
+    # If the input file is a txt it means it contains
+    # the list of planets for the transit/atmosphere functions
+    # Otherwise, is a yaml file for the machine learning part
+    if not input_file.endswith(".yaml"):
+        print(f"Input file {input_file} is not a .yaml file.")
+        return
+    params_input_file = Parameters(Path(input_file))
+    files_yaml_transit = params_input_file.get("list_for_transit")
+    files_yaml_ml = params_input_file.get("list_for_ML")
+    files_yaml_atmosphere = params_input_file.get("list_for_atmosphere")
+    # ---------------------------------- #
+    # Retrieve multi arguments
+    multi = args.multi_plot
+    # ---------------------------------- #
     # If the -t command is passed as argument, the code will
     # calculate the transit light curve using
     # the transit_yaml function
     if args.transit:
-        # call the transit.py file
-        transit_yaml(
-            param_obj_list, output_folder_path_light_curve,
-            input_folder_path_light_curve, multi
-        )
+        if len(files_yaml_transit) > 0:
+            params_transit_list = list()
+            for file in files_yaml_transit:
+                params_transit_list.append(Parameters(Path(input_folder, file)))
+            # call the transit_yaml.py file
+            transit_yaml(
+                params_transit_list, output_folder, input_folder, multi
+            )
+        else:
+            print("Error in command list. Check the arguments")
+    # ---------------------------------- #
+    # Detect machine learning
+    if args.detect:
+        if len(files_yaml_ml) > 0:
+            model = args.detect
+            params_ml_list = list()
+            for file in files_yaml_ml:
+                params_ml_list.append(Parameters(Path(input_folder, file)))
+                machine_learning(input_folder, output_folder, model, params_ml_list)
+        else:
+            print("Error in command list. Check the arguments")
+    # ---------------------------------- #
+    #
+    if args.atmosphere:
+        if len(files_yaml_atmosphere) > 0:
+            print("TODO")
+        else:
+            print("Error in command list. Check the arguments")
+        pass
+    # ------------------------------------------------------------------------------- #
     # End of the program
     finish = datetime.datetime.now()
     print(f"pyELIJAH finishes at {finish}")

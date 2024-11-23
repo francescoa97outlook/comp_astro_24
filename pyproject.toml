@@ -22,9 +22,12 @@ dependencies = [
     "matplotlib",
     "pyqt5",
     "pandas",
+    "scikit-learn",
     "sphinx",
     "sphinx_rtd_theme",
     "pillow",
+    "imblearn",
+    "tensorflow[and-cuda]",
     "numpy==1.26.4",
 ]
 

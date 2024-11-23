@@ -40,9 +40,9 @@ class DatasetTrainDev:
         Init of the datasets
 
         Args:
-            input_path: Path to the input files
-            train_file: Name of the training file
-            dev_file: Name of the development file
+            input_path (str): Path to the input files
+            train_file (str): Name of the csv file containing the training data
+            dev_file (str): Name of the csv file containing the development data
         """
         #
         print("Loading datasets...")
@@ -71,7 +71,7 @@ class DatasetTrainDev:
         LFP = LightFluxProcessor(
             fourier=True, normalize_c=True, gaussian=True, standardize=True
         )
-        df_data_x, df_dev_x = LFP.process(df_train_x, df_dev_x)
+        df_train_x, df_dev_x = LFP.process(df_train_x, df_dev_x)
         #
         # Rejoin X and Y
         df_train_processed = DataFrame(df_train_x).join(DataFrame(df_train_y))
