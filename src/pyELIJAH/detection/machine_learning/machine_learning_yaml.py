@@ -21,8 +21,10 @@ def machine_learning(
     random.seed(1)
     for params in params_list:
         # Retrieve data information
-        data_object = DatasetTrainDev(input_data_folder, params.get("filename_train"), params.get("filename_dev"),
-                                      ml_model)
+        data_object = DatasetTrainDev(
+            input_data_folder, params.get("filename_train"),
+            params.get("filename_dev"), ml_model
+        )
         X_train, Y_train = data_object.get_train()
         X_dev, Y_dev = data_object.get_dev()
         # Build model

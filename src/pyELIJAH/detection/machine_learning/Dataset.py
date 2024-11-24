@@ -1,7 +1,7 @@
 from pathlib import Path
 from pandas import DataFrame, read_csv
 from sklearn.utils import shuffle
-from numpy import array, zeros
+from numpy import array, zeros, array_equal
 from tensorflow import transpose
 
 from pyELIJAH.detection.machine_learning.LightFluxProcessor import LightFluxProcessor
@@ -79,28 +79,59 @@ class DatasetTrainDev:
             else:
                 df_dev_processed = DataFrame(df_dev_x)
             # TODO: find a better way to create the 4D arrays
+            # TODO: 56 need to be a configurable parameter from the yaml file, it is too specific for this dataset,
+            #       same for 3136
             # Save the data on temporary arrays
             X_train_tmp, Y_train_tmp = np_X_Y_from_df(df_train_processed, True)
             X_dev_tmp, Y_dev_tmp = np_X_Y_from_df(df_dev_processed, Y_valid)
-            # Create the arrays with the shape NCHW
+            # TODO: Try this code to check if results are the same. Delete the code that is not chosen
+
+            # Method2:
+            # Slice the temporary arrays to have a perfect square
+            X_train_tmp = X_train_tmp[:, :3136].reshape(-1, 56, 56, 1)  # Reshape to NHWC directly
+            X_dev_tmp = X_dev_tmp[:, :3136].reshape(-1, 56, 56, 1)
+            # Convert labels to the required shape
+            Y_train_tmp = Y_train_tmp.reshape(-1, 1)
+            Y_dev_tmp = Y_dev_tmp.reshape(-1, 1)
+            # Assign to class attributes directly
+            self.X_train = array(X_train_tmp)
+            self.Y_train = array(Y_train_tmp)
+            self.X_dev = array(X_dev_tmp)
+            self.Y_dev = array(Y_dev_tmp)
+            print("X_train.shape: ", self.X_train.shape)
+            print("Y_train.shape: ", self.Y_train.shape)
+            print("X_dev.shape: ", self.X_dev.shape)
+            print("Y_dev.shape: ", self.Y_dev.shape)
+
+
+            # Method2: Create the arrays with the shape NCHW
             # (number, channels, height, width)
-            self.X_train = zeros(shape=(len(X_train_tmp), 1, 56, 56))
-            self.Y_train = zeros(shape=(len(Y_train_tmp), 1))
-            self.X_dev = zeros(shape=(len(X_dev_tmp), 1, 56, 56))
-            self.Y_dev = zeros(shape=(len(Y_dev_tmp), 1))
+            self.X_train1 = zeros(shape=(len(X_train_tmp), 1, 56, 56))
+            self.Y_train1 = zeros(shape=(len(Y_train_tmp), 1))
+            self.X_dev1 = zeros(shape=(len(X_dev_tmp), 1, 56, 56))
+            self.Y_dev1 = zeros(shape=(len(Y_dev_tmp), 1))
             # Slice the temporary arrays to have a perfect square
             X_train_tmp = X_train_tmp[:, :3136]
             X_dev_tmp = X_dev_tmp[:, :3136]
             # Populate the NCHW arrays with 56*56 images
             for i, flux in enumerate(X_train_tmp):
-                self.X_train[i, 0, :, :] = flux.reshape((56, 56))
-                self.Y_train[i, 0] = Y_train_tmp[i]
+                self.X_train1[i, 0, :, :] = flux.reshape((56, 56))
+                self.Y_train1[i, 0] = Y_train_tmp[i]
             for i, flux in enumerate(X_dev_tmp):
-                self.X_dev[i, 0, :, :] = flux.reshape((56, 56))
-                self.Y_dev[i, 0] = Y_dev_tmp[i]
+                self.X_dev1[i, 0, :, :] = flux.reshape((56, 56))
+                self.Y_dev1[i, 0] = Y_dev_tmp[i]
             # Transform from NCHW to NHWC
-            self.X_train = transpose(self.X_train, perm=[0, 2, 3, 1])
-            self.X_dev = transpose(self.X_dev, perm=[0, 2, 3, 1])
+            self.X_train1 = transpose(self.X_train1, perm=[0, 2, 3, 1])
+            self.X_dev1 = transpose(self.X_dev1, perm=[0, 2, 3, 1])
+
+
+            # TODO: delete this part when the method is chosen
+            print("Check if arrays are equal.")
+            print("X_train1==X_train", array_equal(self.X_train1, self.X_train))
+            print("Y_train1==Y_train", array_equal(self.Y_train1, self.Y_train))
+            print("X_dev1==X_dev ", array_equal(self.X_dev1, self.X_dev))
+            print("Y_dev1==Y_dev ", array_equal(self.Y_dev1, self.Y_dev))
+
             #
             # Print data set stats
             (n_x, height, width, channels) = (

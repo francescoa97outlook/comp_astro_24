@@ -182,44 +182,21 @@ class ModelML:
         if self.ML_type == "svm":
             # Train model
             self.model.fit(X, Y)
-        # CNN model training. TODO: possible to have CNN and NN in the same 
-        elif self.ML_type == "cnn":
-            # Add fitted samples to the data to enlarge the dataset
-            # TODO: can SMOTE be used in this case?
-            #sm = SMOTE()
-            #X, Y = sm.fit_resample(X, Y)
-            # Train model
-            history = self.model.fit(X, Y, epochs=self.epoch)
-            # Plot accuracy of the model
-            output_plot = str(Path(self.output_folder, f"plot_{self.ML_type}_{self.current_datetime}.png"))
-            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), layout="constrained")
-            plot_title = f"\nLayers: {self.n_hidden_layers}, neurons: {self.n_neurons}, Dropout rate: {self.dropout_rate}"
-            fig.suptitle(plot_title)
-            # list all data in history
-            print(history.history.keys())
-            # summarize history for accuracy
-            ax1.plot(history.history["accuracy"])
-            ax1.set_title("Model Accuracy")
-            ax1.set_ylabel("Accuracy")
-            ax1.set_xlabel("Epoch")
-            ax1.legend(["train", "test"], loc="upper left")
-            #
-            # summarize history for loss
-            ax2.plot(history.history["loss"])
-            ax2.set_title("Model Loss")
-            ax2.set_ylabel("loss")
-            ax2.set_xlabel("epoch")
-            ax2.legend(["train", "test"], loc="upper left")
-            plt.savefig(output_plot)
-            plt.close(fig)
-        # NN model training
         else:
-            # Add fitted samples to the data to enlarge the dataset
-            sm = SMOTE()
-            X, Y = sm.fit_resample(X, Y)
-            # Train model
-            history = self.model.fit(X, Y.ravel(), epochs=self.epoch, batch_size=self.batch_size)
-            # Plot accuracy of the model
+            # NN model training
+            if not self.ML_type == "nn":
+                # Add fitted samples to the data to enlarge the dataset
+                sm = SMOTE()
+                X, Y = sm.fit_resample(X, Y)
+                # Train model
+                history = self.model.fit(X, Y.ravel(), epochs=self.epoch, batch_size=self.batch_size)
+            # CNN model training.
+            else:
+                # CNN model training. TODO: possible to have CNN and NN in the same
+                # TODO: can SMOTE be used in this case
+                # Train model
+                history = self.model.fit(X, Y, epochs=self.epoch)
+                # Plot accuracy of the model
             output_plot = str(Path(self.output_folder, f"plot_{self.ML_type}_{self.current_datetime}.png"))
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), layout="constrained")
             plot_title = f"\nLayers: {self.n_hidden_layers}, neurons: {self.n_neurons}, Dropout rate: {self.dropout_rate}"
