@@ -94,7 +94,16 @@ class ModelML:
           the output can be interpreted as a probability.
           This is set to 1 because, in our case, we have only one class
           (exoplanets or not)
+        - tf.keras.layers.Conv2D(filters, kernel_size),
+          This layer creates a convolution kernel that is convolved with
+          the layer input over a single spatial (or temporal) dimension
+          to produce a tensor of outputs.
+        - tf.keras.layers.MaxPool2D(pool_size),
+          Downsamples the input along its spatial dimensions (height and width)
+          by taking the maximum value over an input window (of size defined
+          by pool_size) for each channel of the input
     """
+
     def build_model(self):
         """
         This function builds the model used for the machine learning detection.
@@ -112,7 +121,7 @@ class ModelML:
             # Creation of the model
             self.model = tf.keras.models.Sequential()
             # Add input layer large as the size of the input data
-            self.model.add(tf.keras.layers.Input(self.data_shape))
+            self.model.add(tf.keras.layers.Input((self.data_shape[1],)))
             # Add flatten layer to create mono-dimensional the data
             self.model.add(tf.keras.layers.Flatten())
             # Add a certain amount of dense and dropout layers
@@ -126,8 +135,32 @@ class ModelML:
             # Model compilation
             self.model.compile(optimizer="adam", loss=loss_fn, metrics=["accuracy"])
         # Model uses convoluted neural networks algorithm
+        # TODO: take the kernel_size and the Maxpool pool_size from yaml file? 
         elif self.ML_type == "cnn":
-            print("TODO")
+            # Creation of the model
+            self.model = tf.keras.models.Sequential()
+            # Add Conv2D layer to serve as input layer by specifying the input dimensions
+            self.model.add(tf.keras.layers.Conv2D(self.n_neurons, kernel_size=(2, 2),
+                                                  activation="relu",
+                                                  input_shape=self.data_shape[1:],
+                                                  data_format="channels_last"))
+            # Add a maxpooling layer
+            self.model.add(tf.keras.layers.MaxPool2D((2, 2), data_format="channels_last", padding="same"))
+            # Add a certain amount of convolution and maxpooling layers
+            for _ in range(self.n_hidden_layers):
+                self.model.add(tf.keras.layers.Conv2D(self.n_neurons, kernel_size=(2, 2), activation="relu",
+                                                      data_format="channels_last"))
+                self.model.add(tf.keras.layers.MaxPool2D((2, 2), data_format="channels_last", padding="same"))
+            # Add a Flatten layer
+            self.model.add(tf.keras.layers.Flatten(data_format="channels_last"))
+            # Add dense layer for classification
+            self.model.add(tf.keras.layers.Dense(self.n_neurons, activation="relu"))
+            # Add the output layer
+            self.model.add(tf.keras.layers.Dense(1))
+            # Loss funciton calculation
+            loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+            # Model compilation
+            self.model.compile(optimizer="adam", loss=loss_fn, metrics=["accuracy"])
         # The model does not exist
         else:
             print("The model you choose is not supported.")
@@ -149,7 +182,37 @@ class ModelML:
         if self.ML_type == "svm":
             # Train model
             self.model.fit(X, Y)
-        # NN - CNN model training
+        # CNN model training. TODO: possible to have CNN and NN in the same 
+        elif self.ML_type == "cnn":
+            # Add fitted samples to the data to enlarge the dataset
+            # TODO: can SMOTE be used in this case?
+            #sm = SMOTE()
+            #X, Y = sm.fit_resample(X, Y)
+            # Train model
+            history = self.model.fit(X, Y, epochs=self.epoch)
+            # Plot accuracy of the model
+            output_plot = str(Path(self.output_folder, f"plot_{self.ML_type}_{self.current_datetime}.png"))
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), layout="constrained")
+            plot_title = f"\nLayers: {self.n_hidden_layers}, neurons: {self.n_neurons}, Dropout rate: {self.dropout_rate}"
+            fig.suptitle(plot_title)
+            # list all data in history
+            print(history.history.keys())
+            # summarize history for accuracy
+            ax1.plot(history.history["accuracy"])
+            ax1.set_title("Model Accuracy")
+            ax1.set_ylabel("Accuracy")
+            ax1.set_xlabel("Epoch")
+            ax1.legend(["train", "test"], loc="upper left")
+            #
+            # summarize history for loss
+            ax2.plot(history.history["loss"])
+            ax2.set_title("Model Loss")
+            ax2.set_ylabel("loss")
+            ax2.set_xlabel("epoch")
+            ax2.legend(["train", "test"], loc="upper left")
+            plt.savefig(output_plot)
+            plt.close(fig)
+        # NN model training
         else:
             # Add fitted samples to the data to enlarge the dataset
             sm = SMOTE()
@@ -203,8 +266,8 @@ class ModelML:
                 f"\nKernel: {self.kernel}"
                 f"\nDegree (useful only if poly kernel): {self.degree_poly}"
             )
-        # Predict of the data for NN, CNN models
-        else:
+        # Predict of the data for NN model
+        elif self.ML_type == "nn":
             predicted = self.model.predict(X, batch_size=self.batch_size)
             log_temp += (
                 f"\n--------------------------------------"
@@ -214,27 +277,52 @@ class ModelML:
                 f"\nEpochs: {self.epoch}"
                 f"\nBatch size: {self.batch_size}"
             )
+        # Predict of the data for CNN model
+        elif self.ML_type == "cnn":
+            predicted = self.model.predict(X)
+
         #
         predicted = rint(predicted)
         # If results label are provided, it creates a statistics of precision and confusion matrix
         if Y_results is not None:
             accuracy_train = accuracy_score(Y_results, predicted)
-            precision_train = precision_score(Y_results, predicted)
-            recall_train = recall_score(Y_results, predicted)
-            confusion_matrix_train = confusion_matrix(Y_results, predicted)
-            log_temp += (
-                f"\n--------------------------------------"
-                f"\nError: {1.0 - accuracy_train}"
-                f"\n------------"
-                f"\nPrecision: {precision_train}"
-                f"\n------------"
-                f"\nConfusion Matrix:\n{confusion_matrix_train}"
-                f"\n------------"
-                f"\nPositive Predictions: {count_nonzero(predicted)}"
-                f"\n------------"
-                f"\nRecall: {recall_train}"
-                f"\n--------------------------------------"
-            )
+            # Display the prediction results
+            # TODO: splitted the treatment for the cnn model because precision and recall don't work
+            if self.ML_type == "cnn":
+                #precision_train = precision_score(Y_results, predicted)
+                #recall_train = recall_score(Y_results, predicted)
+                confusion_matrix_train = confusion_matrix(Y_results, predicted)
+                log_temp += (
+                    f"\n--------------------------------------"
+                    f"\nError (TODO): {1.0 - accuracy_train}"
+                    f"\n------------"
+                    #f"\nPrecision: {precision_train}"
+                    f"\n------------"
+                    f"\nConfusion Matrix (TODO):\n{confusion_matrix_train}"
+                    f"\n------------"
+                    f"\nPositive Predictions (TODO): {count_nonzero(predicted)}"
+                    f"\n------------"
+                    #f"\nRecall: {recall_train}"
+                    f"\n--------------------------------------"
+                )
+            # Display prediction results for svm and nn models
+            else:
+                precision_train = precision_score(Y_results, predicted)
+                recall_train = recall_score(Y_results, predicted)
+                confusion_matrix_train = tf.math.confusion_matrix(Y_results, predicted)
+                log_temp += (
+                    f"\n--------------------------------------"
+                    f"\nError: {1.0 - accuracy_train}"
+                    f"\n------------"
+                    f"\nPrecision: {precision_train}"
+                    f"\n------------"
+                    f"\nConfusion Matrix:\n{confusion_matrix_train}"
+                    f"\n------------"
+                    f"\nPositive Predictions: {count_nonzero(predicted)}"
+                    f"\n------------"
+                    f"\nRecall: {recall_train}"
+                    f"\n--------------------------------------"
+                )
         else:
             log_temp += (
                 f"\n--------------------------------------"
@@ -247,5 +335,3 @@ class ModelML:
         output_log = str(Path(self.output_folder, f"log_{self.ML_type}_{self.current_datetime}.txt"))
         with open(output_log, "w") as file:
             file.write(log_temp)
-
-
