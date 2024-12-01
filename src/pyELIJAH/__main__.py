@@ -5,6 +5,7 @@ from pathlib import Path
 from pyELIJAH.parameters.parameters import Parameters
 from pyELIJAH.detection.transit.transit_yaml import transit_yaml
 from pyELIJAH.detection.machine_learning.machine_learning_yaml import machine_learning
+from pyELIJAH.dream.gan_model import gan_model
 
 
 def main():
@@ -146,6 +147,13 @@ def main():
         help="Flag to plot all planets information singularly",
         action="store_true",
     )
+    parser.add_argument(
+        "--dream",
+        dest="dream",
+        required=False,
+        help="todo",
+        action="store_true"
+    )
     # ------------------------------------------------------------------------------- #
     # ------------------------------------------------------------------------------- #
     # This command will parse (convert) the arguments
@@ -231,6 +239,17 @@ def main():
             for file in files_yaml_ml:
                 params_ml_list.append(Parameters(Path(input_folder, file)))
                 machine_learning(input_folder, output_folder, model, params_ml_list)
+        else:
+            print("Error in command list. Check the arguments")
+    #
+    # TODO: complete this part
+    if args.dream:
+        if len(files_yaml_ml) > 0:
+            model = args.detect
+            params_ml_list = list()
+            for file in files_yaml_ml:
+                params_ml_list.append(Parameters(Path(input_folder, file)))
+                gan_model(input_folder, output_folder, params_ml_list)
         else:
             print("Error in command list. Check the arguments")
     # ---------------------------------- #
