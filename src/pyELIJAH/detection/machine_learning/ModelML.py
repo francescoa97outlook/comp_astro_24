@@ -14,7 +14,10 @@ from sklearn.metrics import (
 
 
 class ModelML:
-
+    """
+        Model ML class containing the arguments and methods to
+        generate ML models, train them and test them.
+    """
     def __init__(
             self, output_folder, ML_type, kernel="", degree_poly=4, data_shape=100,
             n_hidden_layers=1, n_neurons=1, dropout_rate=0.05, epoch=50,
