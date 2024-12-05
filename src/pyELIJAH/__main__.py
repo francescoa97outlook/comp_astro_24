@@ -17,8 +17,8 @@ def main():
     be passed.
     - pyelijah -h, --help: shows the help message
     - pyelijah -i INPUT_FILE, --input INPUT_FILE:
-      input list file to pass as argument (a txt file containing the list of yaml
-      files, each one in a row)
+      a yaml file containing three list, one for each main modules. Each list
+      contains yaml_files used in the corresponding module.
     - pyelijah -t, --transit: select the transit method
     - pyelijah -id DIRECTORY_INPUT, --directory_input DIRECTORY_INPUT:
       Directory of the input files (yaml, limb darkening...).
@@ -36,6 +36,8 @@ def main():
       exoplanets in a set of data.
       The accepted values are: "svm" for support vector machine,
       "nn" for neural network, "cnn" for convolutional neural network.
+    - pyelijah -dr, --dream: used to call the GAN architecture that allows
+      to 'dream' a new exoplanetary transit light curve
     - pyelijah -a, --atmosphere: atmospheric characterisation from input transmission spectrum
     Args:
 
@@ -54,8 +56,9 @@ def main():
         dest="input_file",
         type=str,
         required=True,
-        help="input list file to pass as argument (a txt file containing the list of planets, "
-             "each one in a row)",
+        help="a yaml file containing three list, "
+             "one for each main modules. Each list"
+             "contains yaml_files used in the corresponding module.",
     )
     # ---------------------------------- #
     # Define an expected command -t.
@@ -136,7 +139,7 @@ def main():
         action="store_true",
     )
     # ---------------------------------- #
-    # Define an expected command -single.
+    # Define an expected command -multi.
     # It is not required and will be used with key multi_plot
     # to plot all planets information singularly
     parser.add_argument(
@@ -147,11 +150,17 @@ def main():
         help="Flag to plot all planets information singularly",
         action="store_true",
     )
+    # ---------------------------------- #
+    # Define an expected command -multi.
+    # It is not required and will be used to
+    # "create" a new exoplanetary transit light curve
     parser.add_argument(
+        "-dr"
         "--dream",
         dest="dream",
         required=False,
-        help="todo",
+        help="command used to call the GAN architecture that"
+             "allows to 'dream' a new exoplanetary transit light curve",
         action="store_true"
     )
     # ------------------------------------------------------------------------------- #
@@ -241,11 +250,10 @@ def main():
                 machine_learning(input_folder, output_folder, model, params_ml_list)
         else:
             print("Error in command list. Check the arguments")
-    #
-    # TODO: complete this part
+    # ---------------------------------- #
+    # Dream machine learning - GAN
     if args.dream:
         if len(files_yaml_ml) > 0:
-            model = args.detect
             params_ml_list = list()
             for file in files_yaml_ml:
                 params_ml_list.append(Parameters(Path(input_folder, file)))
