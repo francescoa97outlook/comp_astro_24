@@ -15,7 +15,7 @@ from IPython.display import HTML
 from pyELIJAH.detection.machine_learning.Dataset import DatasetTrainDev
 from pyELIJAH.dream.Generator import Generator
 from pyELIJAH.dream.Discriminator import Discriminator
-from pyELIJAH.dream.gan_utils import weights_init, plot_gd_loss, plot_real_fake
+from pyELIJAH.dream.gan_utils import weights_init, plot_gd_loss, plot_real_fake, plot_lc
 
 
 def gan_model(
@@ -124,6 +124,7 @@ def gan_model(
 
         # Training Loop
         # Lists to keep track of progress
+        lc_list = np.zeros(shape=(1,1,56,56))
         img_list = []
         G_losses = []
         D_losses = []
@@ -204,6 +205,7 @@ def gan_model(
                     with torch.no_grad():
                         fake = netG(fixed_noise).detach().cpu()
                     img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
+                    lc_list = np.append(lc_list, fake, axis=0)
 
                 iters += 1
 
@@ -233,5 +235,21 @@ def gan_model(
         output_image = str(Path(
             output_folder, f"plot_gan_{current_datetime}.png"
         ))
+
         # Plot real and generated images
         plot_real_fake(real_batch, img_list, device, output_image)
+
+        # To visualize the light curves from both real and generated image
+        # From NCHW to NHWC
+        X_train = X_train.permute(0, 2, 3, 1)
+        to_delete = []
+        for i in range(len(Y_train)):
+            if Y_train[i] == 0:
+                to_delete.append(i)
+        X_train = np.delete(X_train, to_delete, axis=0)
+        # lc_list = lc_list[:3136]
+        output_lc_image = str(Path(
+            output_folder, f"plot_lc_gan_{current_datetime}.png"
+        ))
+        # Plot the light curves from a real and a generated image
+        plot_lc(X_train, lc_list,output_lc_image)

@@ -247,7 +247,7 @@ def main():
             params_ml_list = list()
             for file in files_yaml_ml:
                 params_ml_list.append(Parameters(Path(input_folder, file)))
-                machine_learning(input_folder, output_folder, model, params_ml_list)
+            machine_learning(input_folder, output_folder, model, params_ml_list)
         else:
             print("Error in command list. Check the arguments")
     # ---------------------------------- #
@@ -257,7 +257,7 @@ def main():
             params_ml_list = list()
             for file in files_yaml_ml:
                 params_ml_list.append(Parameters(Path(input_folder, file)))
-                gan_model(input_folder, output_folder, params_ml_list)
+            gan_model(input_folder, output_folder, params_ml_list)
         else:
             print("Error in command list. Check the arguments")
     # ---------------------------------- #
