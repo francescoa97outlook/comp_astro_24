@@ -27,6 +27,11 @@ dependencies = [
     "sphinx_rtd_theme",
     "pillow",
     "imblearn",
+    "pyastronomy",
+    "numba",
+    "ipython",
+    "torch",
+    "torchvision",
     "tensorflow[and-cuda]",
     "numpy==1.26.4",
 ]

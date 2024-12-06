@@ -2,6 +2,7 @@ import datetime
 import argparse
 from pathlib import Path
 
+from pyELIJAH.atmosphere.run_atmosphere import run_atmosphere
 from pyELIJAH.parameters.parameters import Parameters
 from pyELIJAH.detection.transit.transit_yaml import transit_yaml
 from pyELIJAH.detection.machine_learning.machine_learning_yaml import machine_learning
@@ -128,17 +129,6 @@ def main():
         """,
     )
     # ---------------------------------- #
-    #
-    parser.add_argument(
-        "-a",
-        "--atmosphere",
-        dest="atmosphere",
-        required=False,
-        help="Atmospheric Characterisation from "
-             "input transmission spectrum",
-        action="store_true",
-    )
-    # ---------------------------------- #
     # Define an expected command -multi.
     # It is not required and will be used with key multi_plot
     # to plot all planets information singularly
@@ -151,9 +141,7 @@ def main():
         action="store_true",
     )
     # ---------------------------------- #
-    # Define an expected command -multi.
-    # It is not required and will be used to
-    # "create" a new exoplanetary transit light curve
+    # Define an expected command -dr.
     parser.add_argument(
         "-dr",
         "--dream",
@@ -162,6 +150,17 @@ def main():
         help="command used to call the GAN architecture that"
              "allows to 'dream' a new exoplanetary transit light curve",
         action="store_true"
+    )
+    # ---------------------------------- #
+    #
+    parser.add_argument(
+        "-a",
+        "--atmosphere",
+        dest="atmosphere",
+        required=False,
+        help="Atmospheric Characterisation from "
+             "input transmission spectrum",
+        action="store_true",
     )
     # ------------------------------------------------------------------------------- #
     # ------------------------------------------------------------------------------- #
@@ -263,11 +262,13 @@ def main():
     # ---------------------------------- #
     #
     if args.atmosphere:
+        params_atmosphere_list = list()
         if len(files_yaml_atmosphere) > 0:
-            print("TODO")
+            for file in files_yaml_atmosphere:
+                params_atmosphere_list.append(Parameters(Path(input_folder, file)))
+            run_atmosphere(input_folder, output_folder, params_atmosphere_list)
         else:
             print("Error in command list. Check the arguments")
-        pass
     # ------------------------------------------------------------------------------- #
     # End of the program
     finish = datetime.datetime.now()

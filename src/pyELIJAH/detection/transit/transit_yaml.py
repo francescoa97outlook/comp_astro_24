@@ -4,6 +4,7 @@ import matplotlib
 from pathlib import Path
 from pandas import read_csv
 import matplotlib.pyplot as plt
+from PyAstronomy import constants as c
 matplotlib.use('Qt5Agg')
 
 
@@ -64,11 +65,13 @@ def transit_yaml(param_obj_list, output_folder_path, input_folder_path, multi):
         # object to store transit parameters
         params = batman.TransitParams()
         # time of inferior conjunction
-        params.t0 = yaml_params.get("t0")
+        params.t0 = yaml_params.get("time0")
         # orbital period (in days)
-        params.per = yaml_params.get("per")
+        params.per = yaml_params.get("period")
         # planet radius (in units of stellar radii)
-        params.rp = yaml_params.get("rp")
+        planet_radius = yaml_params.get("planet_radius") * c.RJ
+        stellar_radius = yaml_params.get("planet_radius") * c.RSun
+        params.rp = planet_radius / stellar_radius
         # semi-major axis (in units of stellar radii)
         params.a = yaml_params.get("a")
         # orbital inclination (in degrees)
