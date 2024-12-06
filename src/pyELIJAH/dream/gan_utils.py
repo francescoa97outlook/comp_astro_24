@@ -5,10 +5,14 @@ from numpy import transpose
 
 
 def weights_init(m):
-    # custom weights initialization called on ``netG`` and ``netD``
-    # Initialize the weights of the Generator and Discriminator
-    # with numbers sampled from a normal distirbution (mean and
-    # std are passed as 0.0 and 0.02)
+    """
+    Function that initialize the weight of the Generator and Discriminator
+    with number sampled from a normal distribution (mean and std are
+    passed as 0.0 and 0.02)
+
+    Args:
+        m: layer considered for the weight
+    """
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
         nn.init.normal_(m.weight.data, 0.0, 0.02)
@@ -17,6 +21,14 @@ def weights_init(m):
         nn.init.constant_(m.bias.data, 0)
 
 def plot_gd_loss(G_losses, D_losses, output_name):
+    """
+    Function that plots the loss function of the Generator and Discriminator
+
+    Args:
+        G_losses (array): array of the loss function values of the Generator
+        D_losses (array): array of the loss function values of the Discriminator
+        output_name (str): the string used to save the plot
+    """
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.set_title("Generator and Discriminator Loss During Training")
     ax.plot(G_losses, label="G")
@@ -30,6 +42,15 @@ def plot_gd_loss(G_losses, D_losses, output_name):
 
 
 def plot_real_fake(real_batch, img_list, device, output_name):
+    """
+    Function to visualize side by side a selection of real and generated images
+
+    Args:
+        real_batch: batch of real images in tensor format
+        img_list: list of arrays representing generated images
+        device: the device (CUP of GPU) used
+        output_name: the string used to save the plot
+    """
     fig, axs = plt.subplots(1, 2, figsize=(15, 15))
     # Plot the real images
     axs[0].axis("off")

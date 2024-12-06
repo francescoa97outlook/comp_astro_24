@@ -2,7 +2,20 @@ import torch.nn as nn
 
 
 class Generator(nn.Module):
+    """
+    Class that describe the Generator model
+    """
+
     def __init__(self, nz, nc, ngf, ngpu):
+        """
+        This init the Generator object
+
+        Args:
+            nz (int): size of z latent vector (i.e. size of generator input)
+            nc (int): number of channels in the training images
+            ngf (int): size of feature map in the generator
+            ngpu (int): number of available GPUs
+        """
         super(Generator, self).__init__()
         self.nz = nz
         self.nc = nc

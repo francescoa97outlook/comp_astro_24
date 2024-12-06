@@ -155,7 +155,7 @@ def main():
     # It is not required and will be used to
     # "create" a new exoplanetary transit light curve
     parser.add_argument(
-        "-dr"
+        "-dr",
         "--dream",
         dest="dream",
         required=False,

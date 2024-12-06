@@ -72,7 +72,7 @@ class DatasetTrainDev:
             Y_valid = False
 
         # Process the data for convolutional neural networks
-        if model_ml == 'cnn':
+        if model_ml in ["cnn", "gan"]:
             # Process dataset
             LFP = LightFluxProcessor(
                 fourier=False, normalize_c=True, gaussian=True, standardize=True

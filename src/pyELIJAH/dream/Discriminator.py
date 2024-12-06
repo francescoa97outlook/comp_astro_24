@@ -2,7 +2,19 @@ import torch.nn as nn
 
 
 class Discriminator(nn.Module):
+    """
+    Class that describe the Discriminator model
+    """
+
     def __init__(self, nc, ndf, ngpu):
+        """
+        This init the Discriminator object
+
+        Args:
+            nc (int): number of channels in the training images
+            ndf (int): size of feature map in the discriminator
+            ngpu (int): number of available GPUs
+        """
         super(Discriminator, self).__init__()
         self.nc = nc
         self.ndf = ndf

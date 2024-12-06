@@ -22,9 +22,16 @@ def gan_model(
         input_data_folder, output_folder, params_list
 ):
     """
-    todo
-    """
+    Function that implement a Generative Adversarial Network to create new 
+    light curve images from a train dataset. The only accepted image size
+    is 56 pixels by 56 pixels and only 1 channel.
 
+    Args:
+        input_data_folder (str): Path to the folder containing the training data
+        output_folder (str): Path to the folder where to save the output data
+        params_list (list of parameters obj): Object containing list of model parameters
+    """
+    #
     # Set random seed for reproducibility
     manualSeed = 999
     # manualSeed = random.randint(1, 10000) # use if you want new results
@@ -32,48 +39,30 @@ def gan_model(
     random.seed(manualSeed)
     torch.manual_seed(manualSeed)
     torch.use_deterministic_algorithms(True)  # Needed for reproducible results
-
+    #
     for params in params_list:
         # Retrieve data information
-        # TODO: it's ok to use the same cnn preprocess
         data_object = DatasetTrainDev(
-            input_data_folder, "cnn",
+            input_data_folder, "gan",
             params.get("filename_train"), params.get("filename_dev"),
             params.get("array_lenght"), params.get("image_size")
         )
-        # TODO: by defaul the training data are the "train", not "dev"
         X_train, Y_train = data_object.get_train()
-        # X_dev, Y_dev = data_object.get_dev()
-
         # Transform the Y from boolean to integers
         Y_train = Y_train.astype(int)
-        # Y_dev = int(Y_dev)
-
         # Transform to torch tensors
         X_train = torch.Tensor(X_train)
         Y_train = torch.Tensor(Y_train)
-
         # From NHWC to NCHW
         # N=number, H=height, W=width, C=channels
         X_train = X_train.permute(0, 3, 1, 2)
-
         # Create the dataset
         dataset = torch.utils.data.TensorDataset(X_train, Y_train)
-
         # Define some inputs
-        # TODO: pass these as arguments of yaml file
         # Number of workers for dataloader
         workers = 2
-
         # Batch size during training
         batch_size = params.get("batch_size")
-        # Spatial size of training images. All images will be resized to this
-        # size using a transformer.
-        # TODO: this model works only for image_size=56.
-        # Should we put a warning if it's different?
-        # Otherwise the variable is not used and can be removed
-        image_size = params.get("image_size")
-        # TODO: how many of these should we pass from yaml?
         # Number of channels in the training images. For color images this is 3
         nc = 1
         # Size of z latent vector (i.e. size of generator input)
@@ -201,7 +190,7 @@ def gan_model(
                 optimizerG.step()
 
                 # Output training stats
-                if i % 10 == 0:
+                if i % 50 == 0:
                     print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                           % (epoch, num_epochs, i, len(dataloader),
                              errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
@@ -211,11 +200,7 @@ def gan_model(
                 D_losses.append(errD.item())
 
                 # Check how the generator is doing by saving G's output on fixed_noise
-                # TODO: now every 10 iterations the fake images are saved.
-                # Pass this argument via yaml file?
-                # Low value pros: nice animation
-                # Low value cons: heavy .npy file
-                if (iters % 10 == 0) or ((epoch == num_epochs-1) and (i == len(dataloader)-1)):
+                if (iters % 500 == 0) or ((epoch == num_epochs-1) and (i == len(dataloader)-1)):
                     with torch.no_grad():
                         fake = netG(fixed_noise).detach().cpu()
                     img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
@@ -236,7 +221,6 @@ def gan_model(
         np.save(output_list, img_list)
 
         # Show an animation of the generated images
-        # TODO: cannot make the animation work if I move it to gan_utils.py
         fig = plt.figure(figsize=(8, 8))
         plt.axis("off")
         ims = [[plt.imshow(np.transpose(i, (1, 2, 0)), animated=True)] for i in img_list]
