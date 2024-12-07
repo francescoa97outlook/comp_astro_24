@@ -2,7 +2,8 @@ import datetime
 import argparse
 from pathlib import Path
 
-from pyELIJAH.atmosphere.run_atmosphere import run_atmosphere
+from pyELIJAH.atmosphere.atmosphere.run_atmosphere import run_atmosphere
+from pyELIJAH.atmosphere.retrieval.run_retrieval import run_retrieval
 from pyELIJAH.parameters.parameters import Parameters
 from pyELIJAH.detection.transit.transit_yaml import transit_yaml
 from pyELIJAH.detection.machine_learning.machine_learning_yaml import machine_learning
@@ -158,9 +159,9 @@ def main():
         "--atmosphere",
         dest="atmosphere",
         required=False,
+        type=str,
         help="Atmospheric Characterisation from "
              "input transmission spectrum",
-        action="store_true",
     )
     # ------------------------------------------------------------------------------- #
     # ------------------------------------------------------------------------------- #
@@ -220,6 +221,7 @@ def main():
     files_yaml_transit = params_input_file.get("list_for_transit")
     files_yaml_ml = params_input_file.get("list_for_ML")
     files_yaml_atmosphere = params_input_file.get("list_for_atmosphere")
+    files_yaml_retrievals = params_input_file.get("list_for_retrieval")
     # ---------------------------------- #
     # Retrieve multi arguments
     multi = args.multi_plot
@@ -262,11 +264,20 @@ def main():
     # ---------------------------------- #
     #
     if args.atmosphere:
+        action = args.atmosphere
         params_atmosphere_list = list()
-        if len(files_yaml_atmosphere) > 0:
-            for file in files_yaml_atmosphere:
-                params_atmosphere_list.append(Parameters(Path(input_folder, file)))
-            run_atmosphere(input_folder, output_folder, params_atmosphere_list)
+        if (len(files_yaml_atmosphere) > 0 and action == "model") or (len(files_yaml_retrievals) and action == "retrieval"):
+            if action == "model":
+                for file in files_yaml_atmosphere:
+                    params_atmosphere_list.append(Parameters(Path(input_folder, file)))
+                run_atmosphere(input_folder, output_folder, params_atmosphere_list)
+            #
+            elif action == "retrieval":
+                for file in files_yaml_retrievals:
+                    params_atmosphere_list.append(Parameters(Path(input_folder, file)))
+                run_retrieval(input_folder, output_folder, params_atmosphere_list)
+            else:
+                print("Error in command list. Check the arguments")
         else:
             print("Error in command list. Check the arguments")
     # ------------------------------------------------------------------------------- #

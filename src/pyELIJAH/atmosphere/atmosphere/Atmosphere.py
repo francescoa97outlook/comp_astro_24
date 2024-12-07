@@ -19,11 +19,12 @@ from taurex.temperature import Isothermal
 
 
 class Atmosphere:
-    def __init__(self, input_folder, output_folder, atmosphere_yaml_file, planet_yaml):
+    def __init__(self, input_folder, output_folder, atmosphere_yaml_file, planet_yaml, plot=True):
         self.input_folder = input_folder
         self.output_folder = output_folder
         self.atmosphere_yaml_file = atmosphere_yaml_file
         self.planet_yaml = planet_yaml
+        self.plot = plot
         self.planet_name = None
         self.planet = None
         self.star = None
@@ -53,7 +54,7 @@ class Atmosphere:
             radius=float(self.planet_yaml.get("stellar_radius"))
         )
 
-    def read_opacities_and_create_chemistry(self, ):
+    def read_opacities_and_create_chemistry(self):
         # Now lets point the xsection and cia cachers to our files:
         OpacityCache().clear_cache()
         OpacityCache().set_opacity_path(str(Path(self.input_folder, self.atmosphere_yaml_file.get("xsec_path"))))
@@ -66,9 +67,14 @@ class Atmosphere:
         molecs = list(dict_molecs.keys())
         for i, molec in enumerate(molecs):
             temp = dict_molecs[molec]
+            if int(self.atmosphere_yaml_file.get("random_molecule")):
+                mix_ratio = np.random.uniform(float(temp[2]), float(temp[3]))
+            else:
+                mix_ratio = float(temp[2])
             self.chemistry.addGas(ConstantGas(
-                molec, mix_ratio=float(temp[2])
+                molec, mix_ratio=float(mix_ratio)
             ))
+            print(f"{molec} mixing ratio: {mix_ratio}")
             try:
                 temp_press_mix.append(temp)
                 self.cross_sections.append(OpacityCache()[molec])
@@ -76,22 +82,23 @@ class Atmosphere:
                 print(molec + " not found in hitran")
                 continue
         #
-        for i, cross_sect in enumerate(self.cross_sections):
-            fig, ax = plt.subplots(1, 1, figsize=(12, 8))
-            ax.set_xlabel("Wave number")
-            ax.set_ylabel("Cross section")
-            ax.set_title(self.planet_name + " cross sections " + molecs[i])
-            ax.plot(
-                10000 / cross_sect.wavenumberGrid,
-                cross_sect.opacity(temp_press_mix[i][0], 10**temp_press_mix[i][1]),
-                label=f"{molecs[i]}, T={temp_press_mix[i][0]} K, P={10 ** temp_press_mix[i][1]} Pa",
-                alpha=0.5
-            )
-            ax.legend()
-            plt.savefig(str(Path(
-                self.output_folder, self.planet_name + "_" + molecs[i] + "_cross_sections.png"
-            )))
-            plt.close(fig)
+        if self.plot:
+            for i, cross_sect in enumerate(self.cross_sections):
+                fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+                ax.set_xlabel("Wave number")
+                ax.set_ylabel("Cross section")
+                ax.set_title(self.planet_name + " cross sections " + molecs[i])
+                ax.plot(
+                    10000 / cross_sect.wavenumberGrid,
+                    cross_sect.opacity(temp_press_mix[i][0], 10**temp_press_mix[i][1]),
+                    label=f"{molecs[i]}, T={temp_press_mix[i][0]} K, P={10 ** temp_press_mix[i][1]} Pa",
+                    alpha=0.5
+                )
+                ax.legend()
+                plt.savefig(str(Path(
+                    self.output_folder, self.planet_name + "_" + molecs[i] + "_cross_sections.png"
+                )))
+                plt.close(fig)
         #
 
     def create_binning_obj(self):
@@ -148,71 +155,81 @@ class Atmosphere:
             return self.model.model(wavenumberGrid)
 
     def plot_gases(self):
-        fig, ax = plt.subplots(1, 1, figsize = (12, 8))
-        #
-        for x, gasname in enumerate(self.model.chemistry.activeGases):
-            ax.plot(
-                self.model.chemistry.activeGasMixProfile[x],
-                self.model.pressureProfile / 1e5, label=gasname
-            )
-        for x, gasname in enumerate(self.model.chemistry.inactiveGases):
-            ax.plot(
-                self.model.chemistry.inactiveGasMixProfile[x],
-                self.model.pressureProfile / 1e5, label=gasname
-            )
-        ax.invert_yaxis()
-        ax.set_yscale("log")
-        ax.set_xscale("log")
-        ax.set_xlabel("Mix in ratio")
-        ax.set_ylabel("Pressure (Pa)")
-        ax.set_title(self.planet_name + " atmosphere chemistry")
-        ax.legend()
-        plt.savefig(str(Path(self.output_folder, self.planet_name + "_gases.png")))
-        plt.show()
-        plt.close(fig)
+        if self.plot:
+            fig, ax = plt.subplots(1, 1, figsize = (12, 8))
+            #
+            for x, gasname in enumerate(self.model.chemistry.activeGases):
+                ax.plot(
+                    self.model.chemistry.activeGasMixProfile[x],
+                    self.model.pressureProfile / 1e5, label=gasname
+                )
+            for x, gasname in enumerate(self.model.chemistry.inactiveGases):
+                ax.plot(
+                    self.model.chemistry.inactiveGasMixProfile[x],
+                    self.model.pressureProfile / 1e5, label=gasname
+                )
+            ax.invert_yaxis()
+            ax.set_yscale("log")
+            ax.set_xscale("log")
+            ax.set_xlabel("Mix in ratio")
+            ax.set_ylabel("Pressure (Pa)")
+            ax.set_title(self.planet_name + " atmosphere chemistry")
+            ax.legend()
+            plt.savefig(str(Path(self.output_folder, self.planet_name + "_gases.png")))
+            plt.show()
+            plt.close(fig)
 
     def plot_flux(self, result_model):
-        fig, ax = plt.subplots(1, 1, figsize = (12, 8))
-        wn, ratio_rp_rs, _, _ = result_model
-        ax.plot(np.log10(10000 / wn), ratio_rp_rs)
-        ax.set_xlabel("Wavelengths (um)")
-        ax.set_ylabel("Ratio planet-stellar radii")
-        ax.set_title(self.planet_name + " flux")
-        plt.savefig(str(Path(self.output_folder, self.planet_name + "_flux.png")))
-        plt.show()
-        plt.close(fig)
+        if self.plot:
+            fig, ax = plt.subplots(1, 1, figsize = (12, 8))
+            wn, ratio_rp_rs, tau, _ = result_model
+            ax.plot(np.log10(10000 / wn), ratio_rp_rs)
+            ax.set_xlabel("Wavelengths (um)")
+            ax.set_ylabel("Ratio planet-stellar radii")
+            ax.set_title(self.planet_name + " flux")
+            plt.savefig(str(Path(self.output_folder, self.planet_name + "_flux.png")))
+            plt.show()
+            plt.close(fig)
+            # File path
+            output_file = str(Path(self.output_folder, self.planet_name + "_spectrum.dat"))
+            # Write to file
+            ratio_rp_rs_pow = np.power(ratio_rp_rs, 0.5)
+            data = np.column_stack((wn, ratio_rp_rs, ratio_rp_rs_pow))
+            # Save to a .dat file without an empty first row
+            np.savetxt(output_file, data, fmt="%.15e", header="Wavelength TransitDepth Uncertainty", comments="")
 
 
     def compare_models(self, binning=False):
-        self.build_model("Transmission")
-        tm_model = self.calculate_model(binning)
-        self.build_model("Emission")
-        em_model = self.calculate_model(binning)
-        self.build_model("Direct Image")
-        dim_model = self.calculate_model(binning)
-        #
-        fig, ax = plt.subplots(3, 1, figsize = (12, 8), constrained_layout=True)
-        wn, ratio_rp_rs, _, _ = tm_model
-        ax[0].plot(10000 / wn, ratio_rp_rs)
-        #
-        wn, ratio_rp_rs, _, _ = em_model
-        ax[1].plot(10000 / wn, ratio_rp_rs)
-        #
-        wn, ratio_rp_rs, _, _ = dim_model
-        ax[2].plot(10000 / wn, ratio_rp_rs)
-        #
-        ax[0].set_xscale('log')
-        ax[0].set_title('Transmission')
-        ax[0].set_xlabel('Wavelength (um)')
-        ax[0].set_ylabel("Ratio planet-stellar radii")
-        ax[1].set_xscale('log')
-        ax[1].set_title('Emission')
-        ax[1].set_xlabel('Wavelength (um)')
-        ax[1].set_ylabel("Ratio planet-stellar radii")
-        ax[2].set_xscale('log')
-        ax[2].set_title('Direct Image')
-        ax[2].set_xlabel('Wavelength (um)')
-        ax[2].set_ylabel("Ratio planet-stellar radii")
-        plt.savefig(str(Path(self.output_folder, self.planet_name + "_compare.png")))
-        plt.close(fig)
+        if self.plot:
+            self.build_model("Transmission")
+            tm_model = self.calculate_model(binning)
+            self.build_model("Emission")
+            em_model = self.calculate_model(binning)
+            self.build_model("Direct Image")
+            dim_model = self.calculate_model(binning)
+            #
+            fig, ax = plt.subplots(3, 1, figsize = (12, 8), constrained_layout=True)
+            wn, ratio_rp_rs, _, _ = tm_model
+            ax[0].plot(10000 / wn, ratio_rp_rs)
+            #
+            wn, ratio_rp_rs, _, _ = em_model
+            ax[1].plot(10000 / wn, ratio_rp_rs)
+            #
+            wn, ratio_rp_rs, _, _ = dim_model
+            ax[2].plot(10000 / wn, ratio_rp_rs)
+            #
+            ax[0].set_xscale('log')
+            ax[0].set_title('Transmission')
+            ax[0].set_xlabel('Wavelength (um)')
+            ax[0].set_ylabel("Ratio planet-stellar radii")
+            ax[1].set_xscale('log')
+            ax[1].set_title('Emission')
+            ax[1].set_xlabel('Wavelength (um)')
+            ax[1].set_ylabel("Ratio planet-stellar radii")
+            ax[2].set_xscale('log')
+            ax[2].set_title('Direct Image')
+            ax[2].set_xlabel('Wavelength (um)')
+            ax[2].set_ylabel("Ratio planet-stellar radii")
+            plt.savefig(str(Path(self.output_folder, self.planet_name + "_compare.png")))
+            plt.close(fig)
 
