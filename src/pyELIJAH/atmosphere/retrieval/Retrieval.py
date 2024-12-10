@@ -100,7 +100,7 @@ class Retrieval:
             axs[0].errorbar(
                 self.observed_spectrum.wavelengthGrid,
                 self.observed_spectrum.spectrum,
-                self.observed_spectrum.errorBar, label='Observed Spectrum'
+                self.observed_spectrum.errorBar, label='Observed Spectrum', color="r", alpha=0.8
             )
             axs[0].set_ylabel("Ratio planet-stellar radii")
             axs[0].legend()
@@ -108,7 +108,7 @@ class Retrieval:
             axs[1].plot(
                 self.observed_spectrum.wavelengthGrid,
                 spectra,
-                label=self.radiative_mod + " model"
+                label=self.radiative_mod + " model", color="g", alpha=0.8
             )
             axs[1].set_ylabel("Ratio planet-stellar radii")
             axs[1].legend()
@@ -116,12 +116,12 @@ class Retrieval:
             axs[2].plot(
                 self.observed_spectrum.wavelengthGrid,
                 spectra,
-                label=self.radiative_mod + " model"
+                label=self.radiative_mod + " model", color="g", alpha=0.5
             )
             axs[2].errorbar(
                 self.observed_spectrum.wavelengthGrid,
                 self.observed_spectrum.spectrum,
-                self.observed_spectrum.errorBar, label='Observed Spectrum'
+                self.observed_spectrum.errorBar, label='Observed Spectrum', color="r", alpha=0.5
             )
             axs[2].set_ylabel("Ratio planet-stellar radii")
             axs[2].legend()
@@ -129,7 +129,7 @@ class Retrieval:
             axs[3].plot(
                 self.observed_spectrum.wavelengthGrid,
                 self.observed_spectrum.spectrum - spectra,
-                label="Difference between observed and model"
+                label="Difference between observed and model", color="orange", alpha=0.8
             )
             axs[3].set_xlabel('Wavelength (um)')
             axs[3].set_ylabel("Ratio planet-stellar radii")
