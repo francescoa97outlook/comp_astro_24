@@ -197,10 +197,10 @@ class Atmosphere:
             # File path
             output_file = str(Path(self.output_folder, self.planet_name + "_spectrum.dat"))
             # Write to file
-            ratio_rp_rs_pow = np.power(ratio_rp_rs, 0.5)
-            data = np.column_stack((wn, ratio_rp_rs, ratio_rp_rs_pow))
+            ratio_rp_rs_pow = np.zeros(len(ratio_rp_rs)) + np.std(ratio_rp_rs)
+            data = np.column_stack((10000 / wn, ratio_rp_rs, ratio_rp_rs_pow))
             # Save to a .dat file without an empty first row
-            np.savetxt(output_file, data, fmt="%.15e", header="Wavelength TransitDepth Uncertainty", comments="")
+            np.savetxt(output_file, data, fmt="%.15e", comments="")
 
 
     def compare_models(self, binning=False):

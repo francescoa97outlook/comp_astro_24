@@ -33,6 +33,9 @@ dependencies = [
     "torch",
     "torchvision",
     "tensorflow[and-cuda]",
+    "taurex",
+    "corner",
+    "arviz",
     "numpy==1.26.4",
 ]
 
