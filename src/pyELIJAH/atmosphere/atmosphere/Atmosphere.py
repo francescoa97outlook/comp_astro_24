@@ -68,9 +68,9 @@ class Atmosphere:
         for i, molec in enumerate(molecs):
             temp = dict_molecs[molec]
             if int(self.atmosphere_yaml_file.get("random_molecule")):
-                mix_ratio = np.random.uniform(float(temp[2]), float(temp[3]))
+                mix_ratio = np.random.uniform(10**float(temp[2]), 10**float(temp[3]))
             else:
-                mix_ratio = float(temp[2])
+                mix_ratio = 10**float(temp[2])
             self.chemistry.addGas(ConstantGas(
                 molec, mix_ratio=float(mix_ratio)
             ))
@@ -181,13 +181,17 @@ class Atmosphere:
 
     def plot_flux(self, result_model):
         if self.plot:
+            if self.planet_yaml.get("output_atmosphere_file") != "None":
+                plot_name = str(Path(self.output_folder, self.planet_yaml.get("output_atmosphere_file")))
+            else:
+                plot_name = str(Path(self.output_folder, self.planet_name + "_flux.png"))
             fig, ax = plt.subplots(1, 1, figsize = (12, 8))
             wn, ratio_rp_rs, tau, _ = result_model
-            ax.plot(np.log10(10000 / wn), ratio_rp_rs)
+            ax.plot(10000 / wn, ratio_rp_rs)
             ax.set_xlabel("Wavelengths (um)")
             ax.set_ylabel("Ratio planet-stellar radii")
             ax.set_title(self.planet_name + " flux")
-            plt.savefig(str(Path(self.output_folder, self.planet_name + "_flux.png")))
+            plt.savefig(plot_name)
             plt.show()
             plt.close(fig)
             # File path
