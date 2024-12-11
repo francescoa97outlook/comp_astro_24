@@ -1,7 +1,9 @@
+import pickle
 from pathlib import Path
 import numpy as np
 from corner import corner
 from matplotlib import pyplot as plt
+from matplotlib import colormaps as cmp
 from taurex.data.spectrum import ObservedSpectrum
 from taurex.optimizer.nestle import NestleOptimizer
 import taurex.log
@@ -12,13 +14,23 @@ from pyELIJAH.atmosphere.atmosphere.run_atmosphere import atmosphere_exc
 
 class Retrieval:
 
-    def __init__(self, input_folder, output_folder, retrieval_file, atmosphere_yaml_file, planet_yaml):
+    def __init__(self, input_folder, output_folder, retrieval_file, atmosphere_yaml_file, planet_yaml, i_ret):
         self.input_folder = input_folder
         self.output_folder = output_folder
         self.retrieval_file = retrieval_file
         self.atmosphere_yaml_file = atmosphere_yaml_file
         self.planet_yaml = planet_yaml
         self.planet_name = self.planet_yaml.get("planet_name")
+        self.index_retrieval = i_ret
+        if self.retrieval_file.get("output_retrieval_file") != "None":
+            self.output_file = str(Path(
+                self.output_folder, self.retrieval_file.get("output_retrieval_file"))
+            )
+        else:
+            self.output_file = str(Path(self.output_folder, self.planet_name))
+        self.output_file +=  f"_Retrieval_{int(self.index_retrieval)}"
+        cmap = cmp["inferno"]
+        self.colors = cmap(np.linspace(0, 1, 20))
         #
         self.atmosphere = None
         self.radiative_mod= None
@@ -26,7 +38,7 @@ class Retrieval:
         self.binned_spectrum = None
 
     def calculate_radiative_model(self):
-        self.atmosphere = atmosphere_exc(self.input_folder, self.output_folder, self.atmosphere_yaml_file, self.planet_yaml, False)
+        self.atmosphere = atmosphere_exc(self.input_folder, self.output_folder, self.atmosphere_yaml_file, self.planet_yaml, 0, False)
         self.radiative_mod = self.atmosphere_yaml_file.get("radiative_mod")
     
     def plot_observed_spectrum(self):
@@ -57,7 +69,7 @@ class Retrieval:
         ax.set_ylabel("Pressure")
         ax.set_title(self.planet_name + " observed vs model - Raw")
         ax.legend()
-        plt.savefig(str(Path(self.output_folder, self.planet_name + "_raw_model.png")))
+        plt.savefig(self.output_file + "_raw_model.png")
         plt.close(fig)
 
     def retrieval(self):
@@ -95,12 +107,12 @@ class Retrieval:
                 )
             )[1]
             #
-            fig, axs = plt.subplots(4, 1, sharex=True, figsize=(12, 12))
+            fig, axs = plt.subplots(4, 1, sharex=True, figsize=(12, 12), constrained_layout=True, dpi=300)
             fig.suptitle(self.planet_name + " observed vs model - Iteration: " + str(index))
             axs[0].errorbar(
                 self.observed_spectrum.wavelengthGrid,
                 self.observed_spectrum.spectrum,
-                self.observed_spectrum.errorBar, label='Observed Spectrum', color="r", alpha=0.8
+                self.observed_spectrum.errorBar, label='Observed Spectrum', color=self.colors[-5], alpha=0.7
             )
             axs[0].set_ylabel("Ratio planet-stellar radii")
             axs[0].legend()
@@ -108,7 +120,7 @@ class Retrieval:
             axs[1].plot(
                 self.observed_spectrum.wavelengthGrid,
                 spectra,
-                label=self.radiative_mod + " model", color="g", alpha=0.8
+                label=self.radiative_mod + " model", color=self.colors[4], alpha=0.7
             )
             axs[1].set_ylabel("Ratio planet-stellar radii")
             axs[1].legend()
@@ -116,12 +128,12 @@ class Retrieval:
             axs[2].plot(
                 self.observed_spectrum.wavelengthGrid,
                 spectra,
-                label=self.radiative_mod + " model", color="g", alpha=0.5
+                label=self.radiative_mod + " model", color=self.colors[4], alpha=0.3
             )
             axs[2].errorbar(
                 self.observed_spectrum.wavelengthGrid,
                 self.observed_spectrum.spectrum,
-                self.observed_spectrum.errorBar, label='Observed Spectrum', color="r", alpha=0.5
+                self.observed_spectrum.errorBar, label='Observed Spectrum', color=self.colors[-5], alpha=0.3
             )
             axs[2].set_ylabel("Ratio planet-stellar radii")
             axs[2].legend()
@@ -129,14 +141,14 @@ class Retrieval:
             axs[3].plot(
                 self.observed_spectrum.wavelengthGrid,
                 self.observed_spectrum.spectrum - spectra,
-                label="Difference between observed and model", color="orange", alpha=0.8
+                label="Difference between observed and model", color=self.colors[10], alpha=0.7
             )
             axs[3].set_xlabel('Wavelength (um)')
             axs[3].set_ylabel("Ratio planet-stellar radii")
             axs[3].legend()
-            plt.savefig(str(Path(
-                self.output_folder, self.planet_name + "_" + str(index) + ".png"
-            )))
+            #
+            string_output = self.output_file + f"_Iteration_{index}"
+            plt.savefig(string_output + "_results_comparison.png")
             plt.show()
             plt.close(fig)
             #
@@ -148,14 +160,22 @@ class Retrieval:
                 list_names.append(key)
                 list_distributions.append(parameters[key]["trace"])
             #
-            fig = plt.figure(figsize=(12, 8))
+            fig = plt.figure(figsize=(12, 8), dpi=300)
             corner(
                 data=np.array(list_distributions).T, labels=list_names, show_titles=True,
-                title_fmt=".2f", title_kwargs={"fontsize": 12}, fig=fig
+                title_fmt=".2f", title_kwargs={"fontsize": 12}, fig=fig, color=self.colors[4]
             )
             plt.savefig(str(Path(
-                self.output_folder, self.planet_name + "_" + str(index) + "_corner_plot.png", color="orange"
+                string_output + "_corner_plot.png"
             )))
             plt.show()
             plt.close(fig)
             #
+            with open(string_output + "results.pkl", "wb") as f:
+                pickle.dump(self.observed_spectrum.wavelengthGrid, f)
+                pickle.dump(self.observed_spectrum.spectrum, f)
+                pickle.dump(spectra, f)
+                pickle.dump(solution, f)
+                pickle.dump(optimized_map, f)
+                pickle.dump(optimized_value, f)
+                pickle.dump(values, f)

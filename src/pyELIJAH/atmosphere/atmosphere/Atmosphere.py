@@ -2,6 +2,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import taurex.log
+from arviz import output_file
+
 taurex.log.disableLogging()
 from taurex.cache import OpacityCache, CIACache
 from taurex.temperature import Guillot2010
@@ -19,11 +21,17 @@ from taurex.temperature import Isothermal
 
 
 class Atmosphere:
-    def __init__(self, input_folder, output_folder, atmosphere_yaml_file, planet_yaml, plot=True):
+    def __init__(self, input_folder, output_folder, atmosphere_yaml_file, planet_yaml, i_atmo, plot=True):
         self.input_folder = input_folder
         self.output_folder = output_folder
         self.atmosphere_yaml_file = atmosphere_yaml_file
         self.planet_yaml = planet_yaml
+        self.index_atmosphere = i_atmo
+        if self.atmosphere_yaml_file.get("output_atmosphere_file") != "None":
+            self.output_file = str(Path(self.output_folder, self.atmosphere_yaml_file.get("output_atmosphere_file")))
+        else:
+            self.output_file = str(Path(self.output_folder, self.planet_name))
+        self.output_file += f"_Atmosphere_{int(self.index_atmosphere)}"
         self.plot = plot
         self.planet_name = None
         self.planet = None
@@ -95,9 +103,8 @@ class Atmosphere:
                     alpha=0.5
                 )
                 ax.legend()
-                plt.savefig(str(Path(
-                    self.output_folder, self.planet_name + "_" + molecs[i] + "_cross_sections.png"
-                )))
+                #
+                plt.savefig(self.output_file + f"_{molecs[i]}_cross_sections.png")
                 plt.close(fig)
         #
 
@@ -175,32 +182,27 @@ class Atmosphere:
             ax.set_ylabel("Pressure (Pa)")
             ax.set_title(self.planet_name + " atmosphere chemistry")
             ax.legend()
-            plt.savefig(str(Path(self.output_folder, self.planet_name + "_gases.png")))
+            plt.savefig(self.output_file + "_gases.png")
             plt.show()
             plt.close(fig)
 
     def plot_flux(self, result_model):
         if self.plot:
-            if self.planet_yaml.get("output_atmosphere_file") != "None":
-                plot_name = str(Path(self.output_folder, self.planet_yaml.get("output_atmosphere_file")))
-            else:
-                plot_name = str(Path(self.output_folder, self.planet_name + "_flux.png"))
             fig, ax = plt.subplots(1, 1, figsize = (12, 8))
             wn, ratio_rp_rs, tau, _ = result_model
             ax.plot(10000 / wn, ratio_rp_rs)
             ax.set_xlabel("Wavelengths (um)")
             ax.set_ylabel("Ratio planet-stellar radii")
             ax.set_title(self.planet_name + " flux")
-            plt.savefig(plot_name)
+            plt.savefig(self.output_file + "_flux.png")
             plt.show()
             plt.close(fig)
             # File path
-            output_file = str(Path(self.output_folder, self.planet_name + "_spectrum.dat"))
             # Write to file
             ratio_rp_rs_pow = np.zeros(len(ratio_rp_rs)) + np.std(ratio_rp_rs)
             data = np.column_stack((10000 / wn, ratio_rp_rs, ratio_rp_rs_pow))
             # Save to a .dat file without an empty first row
-            np.savetxt(output_file, data, fmt="%.15e", comments="")
+            np.savetxt(self.output_file + "_spectrum.dat", data, fmt="%.15e", comments="")
 
 
     def compare_models(self, binning=False):
@@ -222,18 +224,15 @@ class Atmosphere:
             wn, ratio_rp_rs, _, _ = dim_model
             ax[2].plot(10000 / wn, ratio_rp_rs)
             #
-            ax[0].set_xscale('log')
             ax[0].set_title('Transmission')
             ax[0].set_xlabel('Wavelength (um)')
             ax[0].set_ylabel("Ratio planet-stellar radii")
-            ax[1].set_xscale('log')
             ax[1].set_title('Emission')
             ax[1].set_xlabel('Wavelength (um)')
             ax[1].set_ylabel("Ratio planet-stellar radii")
-            ax[2].set_xscale('log')
             ax[2].set_title('Direct Image')
             ax[2].set_xlabel('Wavelength (um)')
             ax[2].set_ylabel("Ratio planet-stellar radii")
-            plt.savefig(str(Path(self.output_folder, self.planet_name + "_compare.png")))
+            plt.savefig(self.output_file + "_compare.png")
             plt.close(fig)
 

@@ -5,14 +5,14 @@ from pyELIJAH.atmosphere.atmosphere.Atmosphere import Atmosphere
 
 
 def run_atmosphere(input_folder, output_folder, yaml_files):
-    for atmosphere_yaml_file in yaml_files:
+    for i, atmosphere_yaml_file in enumerate(yaml_files):
         for planet in atmosphere_yaml_file.get("planet"):
             planet_yaml = Parameters(Path(input_folder, planet))
-            atmosphere_exc(input_folder, output_folder, atmosphere_yaml_file, planet_yaml)
+            atmosphere_exc(input_folder, output_folder, atmosphere_yaml_file, planet_yaml, i)
 
 
-def atmosphere_exc(input_folder, output_folder, atmosphere_yaml_file, planet_yaml, plot=True):
-    atmosphere = Atmosphere(input_folder, output_folder, atmosphere_yaml_file, planet_yaml, plot)
+def atmosphere_exc(input_folder, output_folder, atmosphere_yaml_file, planet_yaml, index_atmo=1, plot=True):
+    atmosphere = Atmosphere(input_folder, output_folder, atmosphere_yaml_file, planet_yaml, index_atmo, plot)
     atmosphere.generate_profiles()
     atmosphere.read_opacities_and_create_chemistry()
     atmosphere.create_binning_obj()
