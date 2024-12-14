@@ -6,8 +6,6 @@ from matplotlib import pyplot as plt
 from matplotlib import colormaps as cmp
 from taurex.data.spectrum import ObservedSpectrum
 from taurex.optimizer.nestle import NestleOptimizer
-from taurex.optimizer.multinest import MultiNestOptimizer
-import mpi4py.MPI as MPI
 import taurex.log
 taurex.log.disableLogging()
 
@@ -19,7 +17,7 @@ class Retrieval:
         A class for performing retrieval calculations for atmospheric models.
     """
 
-    def __init__(self, input_folder, output_folder, retrieval_file, atmosphere_yaml_file, planet_yaml, i_ret):
+    def __init__(self, input_folder, output_folder, retrieval_file, atmosphere_yaml_file, planet_yaml, i_ret, parallel):
         """
         Args:
             input_folder:
@@ -34,6 +32,8 @@ class Retrieval:
                 A dictionary or YAML file containing the planet's configuration.
             i_ret:
                 An integer representing the index of the retrieval, used for naming outputs.
+            parallel:
+                A flag used to define if the procedure needs to be parallelized or not
         """
         self.input_folder = input_folder
         self.output_folder = output_folder
@@ -41,6 +41,10 @@ class Retrieval:
         self.atmosphere_yaml_file = atmosphere_yaml_file
         self.planet_yaml = planet_yaml
         self.planet_name = self.planet_yaml.get("planet_name")
+        if parallel:
+            self.index_process = 0
+        else:
+            self.index_process = i_ret
         self.index_retrieval = i_ret
         if self.retrieval_file.get("output_retrieval_file") != "None":
             self.output_file = str(Path(
@@ -48,12 +52,12 @@ class Retrieval:
             )
         else:
             self.output_file = str(Path(self.output_folder, self.planet_name))
-        self.output_file +=  f"_Retrieval_{int(self.index_retrieval)}"
+        self.output_file += f"_Retrieval_{int(self.index_retrieval)}"
         cmap = cmp["inferno"]
         self.colors = cmap(np.linspace(0, 1, 20))
         #
         self.atmosphere = None
-        self.radiative_mod= None
+        self.radiative_mod = None
         self.observed_spectrum = None
         self.binned_spectrum = None
 
@@ -104,7 +108,7 @@ class Retrieval:
             self.radiative_mod
         )
         self.observed_spectrum = ObservedSpectrum(str(Path(
-            self.input_folder, self.retrieval_file.get("path_spectrum")[self.index_retrieval]
+            self.input_folder, self.retrieval_file.get("path_spectrum")[self.index_process]
         )))
         self.binned_spectrum = self.observed_spectrum.create_binner()
         fig, ax = plt.subplots(1, 1, figsize=(12, 8))
@@ -129,6 +133,7 @@ class Retrieval:
         ax.legend()
         plt.savefig(self.output_file + "_raw_model.png")
         plt.close(fig)
+        print("Observed spectrum plotted")
 
     # noinspection PyTypeChecker,PyUnresolvedReferences
     def retrieval(self):
@@ -269,7 +274,6 @@ class Retrieval:
                 pickle.dump(optimized_map, f)
                 pickle.dump(optimized_value, f)
                 pickle.dump(values, f)
-
 
     # # noinspection PyTypeChecker,PyUnresolvedReferences
     # def retrieval(self):

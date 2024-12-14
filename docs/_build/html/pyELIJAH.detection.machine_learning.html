@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyELIJAH.detection.machine_learning package &mdash; pyELIJAH 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyELIJAH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">pyELIJAH</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyELIJAH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">pyELIJAH.detection.machine_learning package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pyELIJAH.detection.machine_learning.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pyelijah-detection-machine-learning-package">
+<h1>pyELIJAH.detection.machine_learning package<a class="headerlink" href="#pyelijah-detection-machine-learning-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-pyELIJAH.detection.machine_learning.Dataset">
+<span id="pyelijah-detection-machine-learning-dataset-module"></span><h2>pyELIJAH.detection.machine_learning.Dataset module<a class="headerlink" href="#module-pyELIJAH.detection.machine_learning.Dataset" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.Dataset.DatasetTrainDev">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyELIJAH.detection.machine_learning.Dataset.</span></span><span class="sig-name descname"><span class="pre">DatasetTrainDev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_ml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exo_train.csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exo_dev.csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_lenght</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3136</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">56</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/Dataset.html#DatasetTrainDev"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.Dataset.DatasetTrainDev" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to read and process the data</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.Dataset.DatasetTrainDev.get_dev">
+<span class="sig-name descname"><span class="pre">get_dev</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/Dataset.html#DatasetTrainDev.get_dev"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.Dataset.DatasetTrainDev.get_dev" title="Link to this definition"></a></dt>
+<dd><p>Return the development data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Development data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.Dataset.DatasetTrainDev.get_train">
+<span class="sig-name descname"><span class="pre">get_train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/Dataset.html#DatasetTrainDev.get_train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.Dataset.DatasetTrainDev.get_train" title="Link to this definition"></a></dt>
+<dd><p>Return the training data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Training data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.Dataset.np_X_Y_from_df">
+<span class="sig-prename descclassname"><span class="pre">pyELIJAH.detection.machine_learning.Dataset.</span></span><span class="sig-name descname"><span class="pre">np_X_Y_from_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y_valid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/Dataset.html#np_X_Y_from_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.Dataset.np_X_Y_from_df" title="Link to this definition"></a></dt>
+<dd><p>Shuffle and process of data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – pandas DataFrame containing the data</p></li>
+<li><p><strong>Y_valid</strong> – boolean value indicating whether the labels are inside the dataframe</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyELIJAH.detection.machine_learning.LightFluxProcessor">
+<span id="pyelijah-detection-machine-learning-lightfluxprocessor-module"></span><h2>pyELIJAH.detection.machine_learning.LightFluxProcessor module<a class="headerlink" href="#module-pyELIJAH.detection.machine_learning.LightFluxProcessor" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.LightFluxProcessor.LightFluxProcessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyELIJAH.detection.machine_learning.LightFluxProcessor.</span></span><span class="sig-name descname"><span class="pre">LightFluxProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fourier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaussian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standardize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/LightFluxProcessor.html#LightFluxProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.LightFluxProcessor.LightFluxProcessor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that pre-process the data</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.LightFluxProcessor.LightFluxProcessor.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_train_x_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_dev_x_f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/LightFluxProcessor.html#LightFluxProcessor.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.LightFluxProcessor.LightFluxProcessor.process" title="Link to this definition"></a></dt>
+<dd><p>Effective pre-processing of data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_train_x_f</strong> – dataframe containing training data</p></li>
+<li><p><strong>df_dev_x_f</strong> – dataframe containing development data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.LightFluxProcessor.fourier_transform">
+<span class="sig-prename descclassname"><span class="pre">pyELIJAH.detection.machine_learning.LightFluxProcessor.</span></span><span class="sig-name descname"><span class="pre">fourier_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/LightFluxProcessor.html#fourier_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.LightFluxProcessor.fourier_transform" title="Link to this definition"></a></dt>
+<dd><p>Applies Fourier transform to X</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> – array to apply Fourier transform</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyELIJAH.detection.machine_learning.ModelML">
+<span id="pyelijah-detection-machine-learning-modelml-module"></span><h2>pyELIJAH.detection.machine_learning.ModelML module<a class="headerlink" href="#module-pyELIJAH.detection.machine_learning.ModelML" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.ModelML.ModelML">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyELIJAH.detection.machine_learning.ModelML.</span></span><span class="sig-name descname"><span class="pre">ModelML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ML_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree_poly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_per_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/ModelML.html#ModelML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.ModelML.ModelML" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Model ML class containing the arguments and methods to
+generate ML models, train them and test them.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.ModelML.ModelML.build_model">
+<span class="sig-name descname"><span class="pre">build_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/ModelML.html#ModelML.build_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.ModelML.ModelML.build_model" title="Link to this definition"></a></dt>
+<dd><p>This function builds the model used for the machine learning detection.
+There are 3 possibilities:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>SVM, using scikit-learn SVC <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.svm.SVC.html">https://scikit-learn.org/dev/modules/generated/sklearn.svm.SVC.html</a></p></li>
+<li><p>NN, using tensorflow NN <a class="reference external" href="https://www.tensorflow.org/tutorials/quickstart/beginner">https://www.tensorflow.org/tutorials/quickstart/beginner</a></p></li>
+<li><dl class="simple">
+<dt>CNN, using tensorflow CNN <a class="reference external" href="https://www.tensorflow.org/tutorials/images/cnn">https://www.tensorflow.org/tutorials/images/cnn</a></dt><dd><p>also <a class="reference external" href="https://medium.com/&#64;mayankverma05032001/binary-classification-using-convolution-neural-network-cnn-model-6e35cdf5bdbb">https://medium.com/&#64;mayankverma05032001/binary-classification-using-convolution-neural-network-cnn-model-6e35cdf5bdbb</a></p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.ModelML.ModelML.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y_results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/ModelML.html#ModelML.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.ModelML.ModelML.predict" title="Link to this definition"></a></dt>
+<dd><p>This function predicts the class labels for the given data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – array of elements used to derive the label from the trained model</p></li>
+<li><p><strong>Y_results</strong> – array of labels to che k the model results, if provided</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.ModelML.ModelML.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/ModelML.html#ModelML.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.ModelML.ModelML.train" title="Link to this definition"></a></dt>
+<dd><p>This function trains the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – array of elements used to train the model</p></li>
+<li><p><strong>Y</strong> – labels of the training data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pyELIJAH.detection.machine_learning.machine_learning_yaml">
+<span id="pyelijah-detection-machine-learning-machine-learning-yaml-module"></span><h2>pyELIJAH.detection.machine_learning.machine_learning_yaml module<a class="headerlink" href="#module-pyELIJAH.detection.machine_learning.machine_learning_yaml" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyELIJAH.detection.machine_learning.machine_learning_yaml.machine_learning">
+<span class="sig-prename descclassname"><span class="pre">pyELIJAH.detection.machine_learning.machine_learning_yaml.</span></span><span class="sig-name descname"><span class="pre">machine_learning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_data_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ml_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/machine_learning/machine_learning_yaml.html#machine_learning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.machine_learning.machine_learning_yaml.machine_learning" title="Link to this definition"></a></dt>
+<dd><p>Machine Learning function used to detect exoplanets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_data_folder</strong> (<em>str</em>) – Path to the folder containing the training data</p></li>
+<li><p><strong>output_data_folder</strong> (<em>str</em>) – Path to the folder where to save the output data</p></li>
+<li><p><strong>params_list</strong> (<em>list</em><em> of </em><em>parameters obj</em>) – Object containing list of model parameters</p></li>
+<li><p><strong>ml_model</strong> (<em>str</em>) – Machine Learning model decided</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyELIJAH.detection.machine_learning">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyELIJAH.detection.machine_learning" title="Link to this heading"></a></h2>
+<p>A module used to detect exoplanets of a dataset
+using machine learning algorithms</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francesco Amadori, Paula Manuela Leguizamon Pineda, Leonardo Dal Cin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

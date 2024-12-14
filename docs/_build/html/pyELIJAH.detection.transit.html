@@ -115,7 +115,7 @@ errors of the quadratic limb darkening parametrization</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyELIJAH.detection.transit.transit_yaml.load_limb_coeff">
 <span class="sig-prename descclassname"><span class="pre">pyELIJAH.detection.transit.transit_yaml.</span></span><span class="sig-name descname"><span class="pre">load_limb_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limb_dark_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/transit/transit_yaml.html#load_limb_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.transit.transit_yaml.load_limb_coeff" title="Link to this definition"></a></dt>
-<dd><p>This function return the coefficients for the parametrization
+<dd><p>This function returns the coefficients for the parametrization
 of the limb darkening</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -127,29 +127,28 @@ csv file produced by <a class="reference external" href="https://exoctk.stsci.ed
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>an array containing the mean of at maximum 4 limb darkening coefficients</p>
+<dd class="field-even"><p>an array containing the mean values of each limb darkening coefficients</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyELIJAH.detection.transit.transit_yaml.transit_yaml">
-<span class="sig-prename descclassname"><span class="pre">pyELIJAH.detection.transit.transit_yaml.</span></span><span class="sig-name descname"><span class="pre">transit_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_folder_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/transit/transit_yaml.html#transit_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.transit.transit_yaml.transit_yaml" title="Link to this definition"></a></dt>
-<dd><p>This function calculates the light curve of the transit</p>
+<span class="sig-prename descclassname"><span class="pre">pyELIJAH.detection.transit.transit_yaml.</span></span><span class="sig-name descname"><span class="pre">transit_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_obj_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/detection/transit/transit_yaml.html#transit_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.detection.transit.transit_yaml.transit_yaml" title="Link to this definition"></a></dt>
+<dd><p>This function calculates the transit light curves of the selected planets</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>yaml_params</strong> – object of Parameters class containing the keys and values
-of the stored in the yaml file</p></li>
-<li><p><strong>output_folder_path</strong> – string containing the path to the output folder, where to save results</p></li>
-<li><p><strong>input_folder_path</strong> – string containing the path to the input folder, where to retrieve
-the files needed for the algorithm</p></li>
+<li><p><strong>param_obj_list</strong> – list of objects of Parameters class containing the keys and values
+of the chosen planets</p></li>
+<li><p><strong>output_folder_path</strong> – string containing the output folder path where the results are saved</p></li>
+<li><p><strong>input_folder_path</strong> – string containing the input folder path where the files needed for the
+algorithm are retrieved</p></li>
+<li><p><strong>multi</strong> – flag to plot all planets light curves as single figures</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>an array containing the mean of at maximum 4 limb darkening coefficients</p>
-</dd>
 </dl>
+<p>Return:</p>
 </dd></dl>
 
 </section>

@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyELIJAH.detection.machine_learning.LightFluxProcessor &mdash; pyELIJAH 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyELIJAH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">pyELIJAH</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyELIJAH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyELIJAH.detection.machine_learning.LightFluxProcessor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyELIJAH.detection.machine_learning.LightFluxProcessor</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">zeros</span><span class="p">,</span> <span class="nb">abs</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">ndimage</span><span class="p">,</span> <span class="n">fft</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">StandardScaler</span>
+
+
+<div class="viewcode-block" id="fourier_transform">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.LightFluxProcessor.fourier_transform">[docs]</a>
+<span class="k">def</span> <span class="nf">fourier_transform</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies Fourier transform to X</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X: array to apply Fourier transform</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">size</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="LightFluxProcessor">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.LightFluxProcessor.LightFluxProcessor">[docs]</a>
+<span class="k">class</span> <span class="nc">LightFluxProcessor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class that pre-process the data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fourier</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normalize_c</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">gaussian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fourier: whether to apply Fourier transform to work on the frequency domain</span>
+<span class="sd">            normalize_c: whether to normalize the data</span>
+<span class="sd">            gaussian: whether to apply Gaussian filter to smooth the data</span>
+<span class="sd">            standardize: whether to standardize the data to balance the weight of the data</span>
+<span class="sd">             in case there is a majority of elements appertaining to only one class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fourier</span> <span class="o">=</span> <span class="n">fourier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span> <span class="o">=</span> <span class="n">normalize_c</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussian</span> <span class="o">=</span> <span class="n">gaussian</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">standardize</span> <span class="o">=</span> <span class="n">standardize</span>
+
+<div class="viewcode-block" id="LightFluxProcessor.process">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.LightFluxProcessor.LightFluxProcessor.process">[docs]</a>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df_train_x_f</span><span class="p">,</span> <span class="n">df_dev_x_f</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Effective pre-processing of data</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            df_train_x_f: dataframe containing training data</span>
+<span class="sd">            df_dev_x_f: dataframe containing development data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Apply fourier transform</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourier</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Applying Fourier...&quot;</span><span class="p">)</span>
+            <span class="n">shape_train</span> <span class="o">=</span> <span class="n">df_train_x_f</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">shape_dev</span> <span class="o">=</span> <span class="n">df_dev_x_f</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">df_train_x_f</span> <span class="o">=</span> <span class="n">df_train_x_f</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">fourier_transform</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">df_dev_x_f</span> <span class="o">=</span> <span class="n">df_dev_x_f</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">fourier_transform</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">df_train_x_build</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">shape_train</span><span class="p">)</span>
+            <span class="n">df_dev_x_build</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">shape_dev</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ii_f</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df_train_x_f</span><span class="p">):</span>
+                <span class="n">df_train_x_build</span><span class="p">[</span><span class="n">ii_f</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="k">for</span> <span class="n">ii_f</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df_dev_x_f</span><span class="p">):</span>
+                <span class="n">df_dev_x_build</span><span class="p">[</span><span class="n">ii_f</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">df_train_x_f</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df_train_x_build</span><span class="p">)</span>
+            <span class="n">df_dev_x_f</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df_dev_x_build</span><span class="p">)</span>
+            <span class="c1"># Keep first half of data as it is symmetrical after previous steps</span>
+            <span class="n">df_train_x_f</span> <span class="o">=</span> <span class="n">df_train_x_f</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:(</span><span class="n">df_train_x_f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">df_dev_x_f</span> <span class="o">=</span> <span class="n">df_dev_x_f</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:(</span><span class="n">df_dev_x_f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="c1"># Normalize</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Normalizing...&quot;</span><span class="p">)</span>
+            <span class="n">df_train_x_f</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">normalize</span><span class="p">(</span><span class="n">df_train_x_f</span><span class="p">))</span>
+            <span class="n">df_dev_x_f</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">normalize</span><span class="p">(</span><span class="n">df_dev_x_f</span><span class="p">))</span>
+            <span class="c1"># df_train_x = df_train_x.div(df_train_x.sum(axis=1), axis=0)</span>
+            <span class="c1"># df_dev_x = df_dev_x.div(df_dev_x.sum(axis=1), axis=0)</span>
+
+        <span class="c1"># Gaussian filter to smooth out data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Applying Gaussian Filter...&quot;</span><span class="p">)</span>
+            <span class="n">df_train_x_f</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">gaussian_filter</span><span class="p">(</span><span class="n">df_train_x_f</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">df_dev_x_f</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">gaussian_filter</span><span class="p">(</span><span class="n">df_dev_x_f</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardize</span><span class="p">:</span>
+            <span class="c1"># Standardize X data</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Standardizing...&quot;</span><span class="p">)</span>
+            <span class="n">std_scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+            <span class="n">df_train_x_f</span> <span class="o">=</span> <span class="n">std_scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_train_x_f</span><span class="p">)</span>
+            <span class="n">df_dev_x_f</span> <span class="o">=</span> <span class="n">std_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df_dev_x_f</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Processing!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df_train_x_f</span><span class="p">,</span> <span class="n">df_dev_x_f</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francesco Amadori, Paula Manuela Leguizamon Pineda, Leonardo Dal Cin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

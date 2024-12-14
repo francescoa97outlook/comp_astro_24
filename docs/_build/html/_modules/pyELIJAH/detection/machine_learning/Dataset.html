@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyELIJAH.detection.machine_learning.Dataset &mdash; pyELIJAH 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyELIJAH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">pyELIJAH</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyELIJAH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyELIJAH.detection.machine_learning.Dataset</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyELIJAH.detection.machine_learning.Dataset</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">read_csv</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">shuffle</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
+
+<span class="kn">from</span> <span class="nn">pyELIJAH.detection.machine_learning.LightFluxProcessor</span> <span class="kn">import</span> <span class="n">LightFluxProcessor</span>
+
+
+<div class="viewcode-block" id="np_X_Y_from_df">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.Dataset.np_X_Y_from_df">[docs]</a>
+<span class="k">def</span> <span class="nf">np_X_Y_from_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">Y_valid</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shuffle and process of data</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: pandas DataFrame containing the data</span>
+<span class="sd">        Y_valid: boolean value indicating whether the labels are inside the dataframe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Shuffle the data</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">shuffle</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="c1"># X process</span>
+    <span class="n">df_X</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;LABEL&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">df_X</span><span class="p">)</span>
+    <span class="c1"># Y process if labels are provided</span>
+    <span class="k">if</span> <span class="n">Y_valid</span><span class="p">:</span>
+        <span class="n">Y_raw</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;LABEL&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;LABEL&quot;</span><span class="p">]),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">Y_raw</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span></div>
+
+
+
+<div class="viewcode-block" id="DatasetTrainDev">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.Dataset.DatasetTrainDev">[docs]</a>
+<span class="k">class</span> <span class="nc">DatasetTrainDev</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to read and process the data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">model_ml</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">train_file</span><span class="o">=</span><span class="s2">&quot;exo_train.csv&quot;</span><span class="p">,</span> <span class="n">dev_file</span><span class="o">=</span><span class="s2">&quot;exo_dev.csv&quot;</span><span class="p">,</span>
+                 <span class="n">array_lenght</span><span class="o">=</span><span class="mi">3136</span><span class="p">,</span> <span class="n">image_size</span><span class="o">=</span><span class="mi">56</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init of the datasets</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_path (str): Path to the input files</span>
+<span class="sd">            model_ml (str): Machine Learning model decided. Used only for the cnn model </span>
+<span class="sd">            train_file (str): Name of the csv file containing the training data</span>
+<span class="sd">            dev_file (str): Name of the csv file containing the development data</span>
+<span class="sd">            array_lenght (int): Lenght of the flux array after the slice. Used only for the cnn model</span>
+<span class="sd">            image_size (int): Size of the square image in which the flux arry is reshaped. Used only for the cnn model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loading datasets...&quot;</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="n">path_train</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">train_file</span><span class="p">))</span>
+        <span class="n">path_dev</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">dev_file</span><span class="p">))</span>
+        <span class="c1">#</span>
+        <span class="n">df_train</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">path_train</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span>
+        <span class="n">df_dev</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">path_dev</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># Generate X and Y dataframe sets</span>
+        <span class="n">df_train_x</span> <span class="o">=</span> <span class="n">df_train</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;LABEL&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">df_train_y</span> <span class="o">=</span> <span class="n">df_train</span><span class="o">.</span><span class="n">LABEL</span>
+        <span class="c1"># Define if label column is present or not. If present</span>
+        <span class="c1"># it will be considered</span>
+        <span class="k">if</span> <span class="s2">&quot;LABEL&quot;</span> <span class="ow">in</span> <span class="n">df_dev</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">df_dev_x</span> <span class="o">=</span> <span class="n">df_dev</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;LABEL&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">df_dev_y</span> <span class="o">=</span> <span class="n">df_dev</span><span class="o">.</span><span class="n">LABEL</span>
+            <span class="n">Y_valid</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df_dev_x</span> <span class="o">=</span> <span class="n">df_dev</span>
+            <span class="n">df_dev_y</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">Y_valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Process the data for convolutional neural networks</span>
+        <span class="k">if</span> <span class="n">model_ml</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;cnn&quot;</span><span class="p">,</span> <span class="s2">&quot;gan&quot;</span><span class="p">]:</span>
+            <span class="c1"># Process dataset</span>
+            <span class="n">LFP</span> <span class="o">=</span> <span class="n">LightFluxProcessor</span><span class="p">(</span>
+                <span class="n">fourier</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">normalize_c</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">gaussian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">df_train_x</span><span class="p">,</span> <span class="n">df_dev_x</span> <span class="o">=</span> <span class="n">LFP</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">df_train_x</span><span class="p">,</span> <span class="n">df_dev_x</span><span class="p">)</span>
+            <span class="c1"># Rejoin X and Y</span>
+            <span class="n">df_train_processed</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df_train_x</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_train_y</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">Y_valid</span><span class="p">:</span>
+                <span class="n">df_dev_processed</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df_dev_x</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_dev_y</span><span class="p">))</span>
+                <span class="c1"># Load X and Y numpy arrays</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df_dev_processed</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df_dev_x</span><span class="p">)</span>
+
+            <span class="c1"># Save the data on temporary arrays</span>
+            <span class="n">X_train_tmp</span><span class="p">,</span> <span class="n">Y_train_tmp</span> <span class="o">=</span> <span class="n">np_X_Y_from_df</span><span class="p">(</span><span class="n">df_train_processed</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">X_dev_tmp</span><span class="p">,</span> <span class="n">Y_dev_tmp</span> <span class="o">=</span> <span class="n">np_X_Y_from_df</span><span class="p">(</span><span class="n">df_dev_processed</span><span class="p">,</span> <span class="n">Y_valid</span><span class="p">)</span>
+
+            <span class="c1"># Slice the temporary arrays and reshape</span>
+            <span class="n">X_train_tmp</span> <span class="o">=</span> <span class="n">X_train_tmp</span><span class="p">[:,</span> <span class="p">:</span><span class="n">array_lenght</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                    <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">X_dev_tmp</span> <span class="o">=</span> <span class="n">X_dev_tmp</span><span class="p">[:,</span> <span class="p">:</span><span class="n">array_lenght</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                    <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="c1"># Convert labels to the required shape</span>
+            <span class="n">Y_train_tmp</span> <span class="o">=</span> <span class="n">Y_train_tmp</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">Y_dev_tmp</span> <span class="o">=</span> <span class="n">Y_dev_tmp</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># Assign to class attributes directly</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">X_train_tmp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Y_train</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">Y_train_tmp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_dev</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">X_dev_tmp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Y_dev</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">Y_dev_tmp</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="c1"># Print data set stats</span>
+            <span class="p">(</span><span class="n">n_x</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">channels</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span>
+            <span class="p">)</span>  <span class="c1"># (n_x: input size)</span>
+            <span class="n">n_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_train</span><span class="o">.</span><span class="n">size</span>  <span class="c1"># n_y : output size</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_train.shape: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Y_train.shape: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_dev.shape: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_dev</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Y_dev.shape: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_dev</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;n_x: &quot;</span><span class="p">,</span> <span class="n">n_x</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Images heigh: &quot;</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Images width: &quot;</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of channels: &quot;</span><span class="p">,</span> <span class="n">channels</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;n_y: &quot;</span><span class="p">,</span> <span class="n">n_y</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#</span>
+            <span class="c1"># Process dataset</span>
+            <span class="n">LFP</span> <span class="o">=</span> <span class="n">LightFluxProcessor</span><span class="p">(</span>
+                <span class="n">fourier</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normalize_c</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">gaussian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">df_train_x</span><span class="p">,</span> <span class="n">df_dev_x</span> <span class="o">=</span> <span class="n">LFP</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">df_train_x</span><span class="p">,</span> <span class="n">df_dev_x</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="c1"># Rejoin X and Y</span>
+            <span class="n">df_train_processed</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df_train_x</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_train_y</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">Y_valid</span><span class="p">:</span>
+                <span class="n">df_dev_processed</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df_dev_x</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_dev_y</span><span class="p">))</span>
+                <span class="c1"># Load X and Y numpy arrays</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df_dev_processed</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df_dev_x</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_train</span> <span class="o">=</span> <span class="n">np_X_Y_from_df</span><span class="p">(</span><span class="n">df_train_processed</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_dev</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_dev</span> <span class="o">=</span> <span class="n">np_X_Y_from_df</span><span class="p">(</span><span class="n">df_dev_processed</span><span class="p">,</span> <span class="n">Y_valid</span><span class="p">)</span>
+
+            <span class="c1">#</span>
+            <span class="c1"># Print data set stats</span>
+            <span class="p">(</span><span class="n">num_examples</span><span class="p">,</span> <span class="n">n_x</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span>
+            <span class="p">)</span>  <span class="c1"># (n_x: input size, m : number of examples in the data set)</span>
+            <span class="n">n_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_train</span><span class="o">.</span><span class="n">size</span>  <span class="c1"># n_y : output size</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_train.shape: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Y_train.shape: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_dev.shape: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_dev</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Y_dev.shape: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_dev</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;n_x: &quot;</span><span class="p">,</span> <span class="n">n_x</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;num_examples: &quot;</span><span class="p">,</span> <span class="n">num_examples</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;n_y: &quot;</span><span class="p">,</span> <span class="n">n_y</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DatasetTrainDev.get_train">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.Dataset.DatasetTrainDev.get_train">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_train</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the training data</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Training data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_train</span></div>
+
+
+<div class="viewcode-block" id="DatasetTrainDev.get_dev">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.Dataset.DatasetTrainDev.get_dev">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_dev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the development data</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Development data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_dev</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_dev</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francesco Amadori, Paula Manuela Leguizamon Pineda, Leonardo Dal Cin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

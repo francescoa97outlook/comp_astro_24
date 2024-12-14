@@ -75,6 +75,7 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">read_csv</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">PyAstronomy</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">c</span>
 <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Qt5Agg&#39;</span><span class="p">)</span>
 
 
@@ -84,7 +85,7 @@
 <a class="viewcode-back" href="../../../../pyELIJAH.detection.transit.html#pyELIJAH.detection.transit.transit_yaml.load_limb_coeff">[docs]</a>
 <span class="k">def</span> <span class="nf">load_limb_coeff</span><span class="p">(</span><span class="n">limb_dark_path</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function return the coefficients for the parametrization</span>
+<span class="sd">    This function returns the coefficients for the parametrization</span>
 <span class="sd">    of the limb darkening</span>
 
 <span class="sd">    Args:</span>
@@ -96,7 +97,7 @@
 <span class="sd">            [&quot;quadratic&quot;, &quot;exponential&quot;, &quot;linear&quot;, logarithmic&quot;, &quot;square-root&quot;]</span>
 
 <span class="sd">    Return:</span>
-<span class="sd">        an array containing the mean of at maximum 4 limb darkening coefficients</span>
+<span class="sd">        an array containing the mean values of each limb darkening coefficients</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Storing the file information into a dataframe</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">limb_dark_path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;\s+&#39;</span><span class="p">)</span>
@@ -115,82 +116,102 @@
 <span class="c1"># using batman package</span>
 <div class="viewcode-block" id="transit_yaml">
 <a class="viewcode-back" href="../../../../pyELIJAH.detection.transit.html#pyELIJAH.detection.transit.transit_yaml.transit_yaml">[docs]</a>
-<span class="k">def</span> <span class="nf">transit_yaml</span><span class="p">(</span><span class="n">yaml_params</span><span class="p">,</span> <span class="n">output_folder_path</span><span class="p">,</span> <span class="n">input_folder_path</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">transit_yaml</span><span class="p">(</span><span class="n">param_obj_list</span><span class="p">,</span> <span class="n">output_folder_path</span><span class="p">,</span> <span class="n">input_folder_path</span><span class="p">,</span> <span class="n">multi</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function calculates the light curve of the transit</span>
+<span class="sd">        This function calculates the transit light curves of the selected planets</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            yaml_params:</span>
-<span class="sd">                object of Parameters class containing the keys and values</span>
-<span class="sd">                of the stored in the yaml file</span>
+<span class="sd">            param_obj_list:</span>
+<span class="sd">                list of objects of Parameters class containing the keys and values</span>
+<span class="sd">                of the chosen planets</span>
 <span class="sd">            output_folder_path:</span>
-<span class="sd">                string containing the path to the output folder, where to save results</span>
+<span class="sd">                string containing the output folder path where the results are saved</span>
 <span class="sd">            input_folder_path:</span>
-<span class="sd">                string containing the path to the input folder, where to retrieve</span>
-<span class="sd">                the files needed for the algorithm</span>
+<span class="sd">                string containing the input folder path where the files needed for the</span>
+<span class="sd">                algorithm are retrieved</span>
+<span class="sd">            multi:</span>
+<span class="sd">                flag to plot all planets light curves as single figures</span>
 
 <span class="sd">        Return:</span>
-<span class="sd">            an array containing the mean of at maximum 4 limb darkening coefficients</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-    <span class="n">planet_name</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;planet_name&quot;</span><span class="p">]</span>
-    <span class="c1"># object to store transit parameters</span>
-    <span class="n">params</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitParams</span><span class="p">()</span>
-    <span class="c1"># time of inferior conjunction</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;t0&quot;</span><span class="p">]</span>
-    <span class="c1"># orbital period (in days)</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">per</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;per&quot;</span><span class="p">]</span>
-    <span class="c1"># planet radius (in units of stellar radii)</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">rp</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;rp&quot;</span><span class="p">]</span>
-    <span class="c1"># semi-major axis (in units of stellar radii)</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span>
-    <span class="c1"># orbital inclination (in degrees)</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">inc</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;inc&quot;</span><span class="p">]</span>
-    <span class="c1"># eccentricity</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">ecc</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;ecc&quot;</span><span class="p">]</span>
-    <span class="c1"># longitude of periastron (in degrees)</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">]</span>
-    <span class="c1"># transit time between point 1 and 4 in hours</span>
-    <span class="n">t14h</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;t14h&quot;</span><span class="p">]</span>
-    <span class="c1"># transit time in days</span>
-    <span class="n">t14d</span> <span class="o">=</span> <span class="n">t14h</span> <span class="o">/</span> <span class="mi">24</span>
-    <span class="c1"># limb darkening model</span>
-    <span class="n">csv_profile_name</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;limb_dark&quot;</span><span class="p">]</span>
-    <span class="c1"># Correction in case of square root name</span>
-    <span class="n">limb_profile</span> <span class="o">=</span> <span class="s2">&quot;squareroot&quot;</span> <span class="k">if</span> <span class="p">(</span>
-            <span class="n">csv_profile_name</span> <span class="o">==</span> <span class="s2">&quot;square-root&quot;</span>
-    <span class="p">)</span> <span class="k">else</span> <span class="n">csv_profile_name</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">limb_dark</span> <span class="o">=</span> <span class="n">limb_profile</span>
-    <span class="c1"># Coefficients limb darkening</span>
-    <span class="n">file_limb_dark</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
-        <span class="n">input_folder_path</span><span class="p">,</span> <span class="n">yaml_params</span><span class="p">[</span><span class="s2">&quot;file_limb_dark&quot;</span><span class="p">]</span>
-    <span class="p">))</span>
-    <span class="n">limb_dark_coeff</span> <span class="o">=</span> <span class="n">load_limb_coeff</span><span class="p">(</span>
-        <span class="n">file_limb_dark</span><span class="p">,</span> <span class="n">csv_profile_name</span>
-    <span class="p">)</span>
-    <span class="c1"># limb darkening coefficients</span>
-    <span class="c1"># In this way they could be from 1 to 4</span>
-    <span class="c1"># depending on the method</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">limb_dark_coeff</span><span class="p">[</span><span class="o">~</span><span class="n">isnan</span><span class="p">(</span><span class="n">limb_dark_coeff</span><span class="p">)]</span>
-    <span class="n">limit_transit</span> <span class="o">=</span> <span class="n">t14d</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">t14d</span>
-    <span class="c1"># times at which to calculate light curve (days)</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">limit_transit</span><span class="p">,</span> <span class="n">limit_transit</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
-    <span class="c1"># initializes model</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-    <span class="c1"># calculates light curve</span>
-    <span class="n">flux</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">light_curve</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-    <span class="c1"># Plot the figure</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time from central transit&quot;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Relative flux&quot;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
-        <span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot; light curve with &quot;</span> <span class="o">+</span> <span class="n">limb_profile</span> <span class="o">+</span>
-        <span class="s2">&quot; limb darkening approximation&quot;</span>
-    <span class="p">)</span>
+    <span class="n">fig_single</span><span class="p">,</span> <span class="n">ax_single</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">yaml_params</span> <span class="ow">in</span> <span class="n">param_obj_list</span><span class="p">:</span>
+        <span class="n">planet_name</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;planet_name&quot;</span><span class="p">)</span>
+        <span class="c1"># object to store transit parameters</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitParams</span><span class="p">()</span>
+        <span class="c1"># time of inferior conjunction</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time0&quot;</span><span class="p">)</span>
+        <span class="c1"># orbital period (in days)</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">per</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span>
+        <span class="c1"># planet radius (in units of stellar radii)</span>
+        <span class="n">planet_radius</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;planet_radius&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span><span class="o">.</span><span class="n">RJ</span>
+        <span class="n">stellar_radius</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;planet_radius&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span><span class="o">.</span><span class="n">RSun</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">rp</span> <span class="o">=</span> <span class="n">planet_radius</span> <span class="o">/</span> <span class="n">stellar_radius</span>
+        <span class="c1"># semi-major axis (in units of stellar radii)</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+        <span class="c1"># orbital inclination (in degrees)</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">inc</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;inc&quot;</span><span class="p">)</span>
+        <span class="c1"># eccentricity</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">ecc</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ecc&quot;</span><span class="p">)</span>
+        <span class="c1"># longitude of periastron (in degrees)</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+        <span class="c1"># transit time between point 1 and 4 in hours</span>
+        <span class="n">t14h</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;t14h&quot;</span><span class="p">)</span>
+        <span class="c1"># transit time in days</span>
+        <span class="n">t14d</span> <span class="o">=</span> <span class="n">t14h</span> <span class="o">/</span> <span class="mi">24</span>
+        <span class="c1"># limb darkening model</span>
+        <span class="n">csv_profile_name</span> <span class="o">=</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;limb_dark&quot;</span><span class="p">)</span>
+        <span class="c1"># Correction in case of square root name</span>
+        <span class="n">limb_profile</span> <span class="o">=</span> <span class="s2">&quot;squareroot&quot;</span> <span class="k">if</span> <span class="p">(</span>
+                <span class="n">csv_profile_name</span> <span class="o">==</span> <span class="s2">&quot;square-root&quot;</span>
+        <span class="p">)</span> <span class="k">else</span> <span class="n">csv_profile_name</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">limb_dark</span> <span class="o">=</span> <span class="n">limb_profile</span>
+        <span class="c1"># Coefficients limb darkening</span>
+        <span class="n">file_limb_dark</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">input_folder_path</span><span class="p">,</span> <span class="n">yaml_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;file_limb_dark&quot;</span><span class="p">)</span>
+        <span class="p">))</span>
+        <span class="n">limb_dark_coeff</span> <span class="o">=</span> <span class="n">load_limb_coeff</span><span class="p">(</span>
+            <span class="n">file_limb_dark</span><span class="p">,</span> <span class="n">csv_profile_name</span>
+        <span class="p">)</span>
+        <span class="c1"># limb darkening coefficients</span>
+        <span class="c1"># In this way they could be from 1 to 4</span>
+        <span class="c1"># depending on the method</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">limb_dark_coeff</span><span class="p">[</span><span class="o">~</span><span class="n">isnan</span><span class="p">(</span><span class="n">limb_dark_coeff</span><span class="p">)]</span>
+        <span class="n">limit_transit</span> <span class="o">=</span> <span class="n">t14d</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">t14d</span>
+        <span class="c1"># times at which to calculate light curve (days)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">limit_transit</span> <span class="o">+</span> <span class="n">params</span><span class="o">.</span><span class="n">t0</span><span class="p">,</span> <span class="n">limit_transit</span> <span class="o">+</span> <span class="n">params</span><span class="o">.</span><span class="n">t0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
+        <span class="c1"># initializes model</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="c1"># calculates light curve</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">light_curve</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># Plot the figure of the single planet</span>
+        <span class="k">if</span> <span class="n">multi</span><span class="p">:</span>
+            <span class="n">fig_multi</span><span class="p">,</span> <span class="n">ax_multi</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+            <span class="n">ax_multi</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
+            <span class="n">ax_multi</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time from central transit [days]&quot;</span><span class="p">)</span>
+            <span class="n">ax_multi</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Relative flux&quot;</span><span class="p">)</span>
+            <span class="n">ax_multi</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+                <span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot; light curve with &quot;</span> <span class="o">+</span> <span class="n">limb_profile</span> <span class="o">+</span>
+                <span class="s2">&quot; limb darkening approximation&quot;</span>
+            <span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+                <span class="n">output_folder_path</span><span class="p">,</span>
+                <span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">limb_profile</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span>
+            <span class="p">)))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig_multi</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="n">ax_single</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="n">limb_profile</span><span class="p">)</span>
+    <span class="c1"># Plot all the planets</span>
+    <span class="n">ax_single</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time from central transit [days]&quot;</span><span class="p">)</span>
+    <span class="n">ax_single</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Relative flux&quot;</span><span class="p">)</span>
+    <span class="n">ax_single</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Light curves&quot;</span><span class="p">)</span>
+    <span class="n">ax_single</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower right&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
-        <span class="n">output_folder_path</span><span class="p">,</span>
-        <span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">limb_profile</span> <span class="o">+</span> <span class="s2">&quot;_assignment1_taskF.png&quot;</span>
+        <span class="n">output_folder_path</span><span class="p">,</span> <span class="s2">&quot;planets_light_curves.png&quot;</span>
     <span class="p">)))</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig_single</span><span class="p">)</span></div>
 
 </pre></div>
 

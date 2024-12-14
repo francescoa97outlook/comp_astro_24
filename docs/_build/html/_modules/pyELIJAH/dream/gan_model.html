@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyELIJAH.dream.gan_model &mdash; pyELIJAH 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyELIJAH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyELIJAH</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyELIJAH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyELIJAH.dream.gan_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyELIJAH.dream.gan_model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.parallel</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">import</span> <span class="nn">torch.utils.data</span>
+<span class="kn">import</span> <span class="nn">torchvision.utils</span> <span class="k">as</span> <span class="nn">vutils</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.animation</span> <span class="k">as</span> <span class="nn">animation</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
+
+<span class="kn">from</span> <span class="nn">pyELIJAH.detection.machine_learning.Dataset</span> <span class="kn">import</span> <span class="n">DatasetTrainDev</span>
+<span class="kn">from</span> <span class="nn">pyELIJAH.dream.Generator</span> <span class="kn">import</span> <span class="n">Generator</span>
+<span class="kn">from</span> <span class="nn">pyELIJAH.dream.Discriminator</span> <span class="kn">import</span> <span class="n">Discriminator</span>
+<span class="kn">from</span> <span class="nn">pyELIJAH.dream.gan_utils</span> <span class="kn">import</span> <span class="n">weights_init</span><span class="p">,</span> <span class="n">plot_gd_loss</span><span class="p">,</span> <span class="n">plot_real_fake</span><span class="p">,</span> <span class="n">plot_lc</span>
+
+
+<div class="viewcode-block" id="gan_model">
+<a class="viewcode-back" href="../../../pyELIJAH.dream.html#pyELIJAH.dream.gan_model.gan_model">[docs]</a>
+<span class="k">def</span> <span class="nf">gan_model</span><span class="p">(</span>
+        <span class="n">input_data_folder</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">,</span> <span class="n">params_list</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function that implement a Generative Adversarial Network to create new </span>
+<span class="sd">    light curve images from a train dataset. The only accepted image size</span>
+<span class="sd">    is 56 pixels by 56 pixels and only 1 channel.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data_folder (str): Path to the folder containing the training data</span>
+<span class="sd">        output_folder (str): Path to the folder where to save the output data</span>
+<span class="sd">        params_list (list of parameters obj): Object containing list of model parameters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#</span>
+    <span class="c1"># Set random seed for reproducibility</span>
+    <span class="n">manualSeed</span> <span class="o">=</span> <span class="mi">999</span>
+    <span class="c1"># manualSeed = random.randint(1, 10000) # use if you want new results</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Random Seed: &quot;</span><span class="p">,</span> <span class="n">manualSeed</span><span class="p">)</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">manualSeed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">manualSeed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">use_deterministic_algorithms</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Needed for reproducible results</span>
+    <span class="c1">#</span>
+    <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">params_list</span><span class="p">:</span>
+        <span class="c1"># Retrieve data information</span>
+        <span class="n">data_object</span> <span class="o">=</span> <span class="n">DatasetTrainDev</span><span class="p">(</span>
+            <span class="n">input_data_folder</span><span class="p">,</span> <span class="s2">&quot;gan&quot;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filename_train&quot;</span><span class="p">),</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filename_dev&quot;</span><span class="p">),</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;array_lenght&quot;</span><span class="p">),</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_size&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span> <span class="o">=</span> <span class="n">data_object</span><span class="o">.</span><span class="n">get_train</span><span class="p">()</span>
+        <span class="c1"># Transform the Y from boolean to integers</span>
+        <span class="n">Y_train</span> <span class="o">=</span> <span class="n">Y_train</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="c1"># Transform to torch tensors</span>
+        <span class="n">X_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+        <span class="n">Y_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">Y_train</span><span class="p">)</span>
+        <span class="c1"># From NHWC to NCHW</span>
+        <span class="c1"># N=number, H=height, W=width, C=channels</span>
+        <span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Create the dataset</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+        <span class="c1"># Define some inputs</span>
+        <span class="c1"># Number of workers for dataloader</span>
+        <span class="n">workers</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="c1"># Batch size during training</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">)</span>
+        <span class="c1"># Number of channels in the training images. For color images this is 3</span>
+        <span class="n">nc</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># Size of z latent vector (i.e. size of generator input)</span>
+        <span class="n">nz</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nz&quot;</span><span class="p">)</span>
+        <span class="c1"># Size of feature maps in generator</span>
+        <span class="n">ngf</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ngf&quot;</span><span class="p">)</span>
+        <span class="c1"># Size of feature maps in discriminator</span>
+        <span class="n">ndf</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ndf&quot;</span><span class="p">)</span>
+        <span class="c1"># Number of training epochs</span>
+        <span class="n">num_epochs</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;epoch&quot;</span><span class="p">)</span>
+        <span class="c1"># Learning rate for optimizers</span>
+        <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.0002</span>
+        <span class="c1"># B eta1 hyperparameter for Adam optimizers</span>
+        <span class="n">beta1</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="c1"># Number of GPUs available. Use 0 for CPU mode.</span>
+        <span class="n">ngpu</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ngpu&quot;</span><span class="p">)</span>
+        <span class="c1"># Create the dataloader</span>
+        <span class="n">dataloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
+                                                 <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+                                                 <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                 <span class="n">num_workers</span><span class="o">=</span><span class="n">workers</span><span class="p">)</span>
+
+        <span class="c1"># Decide which device we want to run on</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="ow">and</span> <span class="n">ngpu</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create the generator and discriminator</span>
+        <span class="n">netG</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">(</span><span class="n">nz</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">ngf</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">netD</span> <span class="o">=</span> <span class="n">Discriminator</span><span class="p">(</span><span class="n">nc</span><span class="p">,</span> <span class="n">ndf</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># Handle multi-GPU if desired</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ngpu</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">netG</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">netG</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ngpu</span><span class="p">)))</span>
+            <span class="n">netD</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">netD</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ngpu</span><span class="p">)))</span>
+
+        <span class="c1"># Apply the ``weights_init`` function to randomly initialize all weights</span>
+        <span class="c1">#  to ``mean=0``, ``stdev=0.02``.</span>
+        <span class="n">netG</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">weights_init</span><span class="p">)</span>
+        <span class="n">netD</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">weights_init</span><span class="p">)</span>
+
+        <span class="c1"># Print the models</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">netG</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">netD</span><span class="p">)</span>
+
+        <span class="c1"># Initialize the ``BCELoss`` function</span>
+        <span class="c1"># Binaty Cross-Entropy loss function</span>
+        <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCELoss</span><span class="p">()</span>
+
+        <span class="c1"># Create batch of latent vectors that we will use to visualize</span>
+        <span class="c1">#  the progression of the generator</span>
+        <span class="n">fixed_noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">nz</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># Establish convention for real and fake labels during training</span>
+        <span class="n">real_label</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="n">fake_label</span> <span class="o">=</span> <span class="mf">0.</span>
+
+        <span class="c1"># Setup Adam optimizers for both G and D</span>
+        <span class="n">optimizerD</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">netD</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="n">beta1</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
+        <span class="n">optimizerG</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">netG</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="n">beta1</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
+
+        <span class="c1"># Training Loop</span>
+        <span class="c1"># Lists to keep track of progress</span>
+        <span class="n">lc_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">56</span><span class="p">,</span><span class="mi">56</span><span class="p">))</span>
+        <span class="n">img_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">G_losses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">D_losses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">iters</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting Training Loop...&quot;</span><span class="p">)</span>
+        <span class="c1"># For each epoch</span>
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+            <span class="c1"># For each batch in the dataloader</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+
+                <span class="c1">############################</span>
+                <span class="c1"># (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))</span>
+                <span class="c1">###########################</span>
+                <span class="c1"># Train with all-real batch</span>
+                <span class="n">netD</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                <span class="c1"># Format batch</span>
+                <span class="n">real_cpu</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">b_size</span> <span class="o">=</span> <span class="n">real_cpu</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">b_size</span><span class="p">,),</span> <span class="n">real_label</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span>
+                                   <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+                <span class="c1"># Forward pass real batch through D</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">netD</span><span class="p">(</span><span class="n">real_cpu</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># Calculate loss on all-real batch</span>
+                <span class="n">errD_real</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                <span class="c1"># Calculate gradients for D in backward pass</span>
+                <span class="n">errD_real</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">D_x</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+                <span class="c1"># Train with all-fake batch</span>
+                <span class="c1"># Generate batch of latent vectors</span>
+                <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">b_size</span><span class="p">,</span> <span class="n">nz</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+                <span class="c1"># Generate fake image batch with G</span>
+                <span class="n">fake</span> <span class="o">=</span> <span class="n">netG</span><span class="p">(</span><span class="n">noise</span><span class="p">)</span>
+                <span class="n">label</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="n">fake_label</span><span class="p">)</span>
+                <span class="c1"># Classify all fake batch with D</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">netD</span><span class="p">(</span><span class="n">fake</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># Calculate D&#39;s loss on the all-fake batch</span>
+                <span class="n">errD_fake</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                <span class="c1"># Calculate the gradients for this batch, accumulated (summed)</span>
+                <span class="c1"># with previous gradients</span>
+                <span class="n">errD_fake</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">D_G_z1</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="c1"># Compute error of D as sum over the fake and the real batches</span>
+                <span class="n">errD</span> <span class="o">=</span> <span class="n">errD_real</span> <span class="o">+</span> <span class="n">errD_fake</span>
+                <span class="c1"># Update D</span>
+                <span class="n">optimizerD</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+                <span class="c1">############################</span>
+                <span class="c1"># (2) Update G network: maximize log(D(G(z)))</span>
+                <span class="c1">###########################</span>
+                <span class="n">netG</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                <span class="c1"># fake labels are real for generator cost</span>
+                <span class="n">label</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="n">real_label</span><span class="p">)</span>
+                <span class="c1"># Since we just updated D, perform another forward pass</span>
+                <span class="c1"># of all-fake batch through D</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">netD</span><span class="p">(</span><span class="n">fake</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># Calculate G&#39;s loss based on this output</span>
+                <span class="n">errG</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                <span class="c1"># Calculate gradients for G</span>
+                <span class="n">errG</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">D_G_z2</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="c1"># Update G</span>
+                <span class="n">optimizerG</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+                <span class="c1"># Output training stats</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">50</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">][</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">]</span><span class="se">\t</span><span class="s1">Loss_D: </span><span class="si">%.4f</span><span class="se">\t</span><span class="s1">Loss_G: </span><span class="si">%.4f</span><span class="se">\t</span><span class="s1">D(x): </span><span class="si">%.4f</span><span class="se">\t</span><span class="s1">D(G(z)): </span><span class="si">%.4f</span><span class="s1"> / </span><span class="si">%.4f</span><span class="s1">&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">),</span>
+                             <span class="n">errD</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">errG</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">D_x</span><span class="p">,</span> <span class="n">D_G_z1</span><span class="p">,</span> <span class="n">D_G_z2</span><span class="p">))</span>
+
+                <span class="c1"># Save Losses for plotting later</span>
+                <span class="n">G_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">errG</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+                <span class="n">D_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">errD</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+                <span class="c1"># Check how the generator is doing by saving G&#39;s output on fixed_noise</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">iters</span> <span class="o">%</span> <span class="mi">500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">epoch</span> <span class="o">==</span> <span class="n">num_epochs</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
+                    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                        <span class="n">fake</span> <span class="o">=</span> <span class="n">netG</span><span class="p">(</span><span class="n">fixed_noise</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+                    <span class="n">img_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vutils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">fake</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                    <span class="n">lc_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lc_list</span><span class="p">,</span> <span class="n">fake</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">iters</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Plot generator and discriminator loss</span>
+        <span class="n">current_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y_%m_</span><span class="si">%d</span><span class="s2">T%H_%M_%S&quot;</span><span class="p">)</span>
+        <span class="n">output_loss</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">output_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;plot_gan_losses_</span><span class="si">{</span><span class="n">current_datetime</span><span class="si">}</span><span class="s2">.png&quot;</span>
+        <span class="p">))</span>
+        <span class="n">plot_gd_loss</span><span class="p">(</span><span class="n">G_losses</span><span class="p">,</span> <span class="n">D_losses</span><span class="p">,</span> <span class="n">output_loss</span><span class="p">)</span>
+
+        <span class="c1"># Save the list of generated images</span>
+        <span class="n">output_list</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">output_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;list_gan_fake_</span><span class="si">{</span><span class="n">current_datetime</span><span class="si">}</span><span class="s2">.npy&quot;</span>
+        <span class="p">))</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output_list</span><span class="p">,</span> <span class="n">img_list</span><span class="p">)</span>
+
+        <span class="c1"># Show an animation of the generated images</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">ims</span> <span class="o">=</span> <span class="p">[[</span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">animated</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">img_list</span><span class="p">]</span>
+        <span class="n">ani</span> <span class="o">=</span> <span class="n">animation</span><span class="o">.</span><span class="n">ArtistAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ims</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                                        <span class="n">repeat_delay</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">HTML</span><span class="p">(</span><span class="n">ani</span><span class="o">.</span><span class="n">to_jshtml</span><span class="p">())</span>
+
+        <span class="c1"># Grab a batch of real images from the dataloader</span>
+        <span class="n">real_batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dataloader</span><span class="p">))</span>
+        <span class="n">output_image</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">output_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;plot_gan_</span><span class="si">{</span><span class="n">current_datetime</span><span class="si">}</span><span class="s2">.png&quot;</span>
+        <span class="p">))</span>
+
+        <span class="c1"># Plot real and generated images</span>
+        <span class="n">plot_real_fake</span><span class="p">(</span><span class="n">real_batch</span><span class="p">,</span> <span class="n">img_list</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">output_image</span><span class="p">)</span>
+
+        <span class="c1"># To visualize the light curves from both real and generated image</span>
+        <span class="c1"># From NCHW to NHWC</span>
+        <span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">to_delete</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Y_train</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">Y_train</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">to_delete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">to_delete</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># lc_list = lc_list[:3136]</span>
+        <span class="n">output_lc_image</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">output_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;plot_lc_gan_</span><span class="si">{</span><span class="n">current_datetime</span><span class="si">}</span><span class="s2">.png&quot;</span>
+        <span class="p">))</span>
+        <span class="c1"># Plot the light curves from a real and a generated image</span>
+        <span class="n">plot_lc</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">lc_list</span><span class="p">,</span><span class="n">output_lc_image</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francesco Amadori, Paula Manuela Leguizamon Pineda, Leonardo Dal Cin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

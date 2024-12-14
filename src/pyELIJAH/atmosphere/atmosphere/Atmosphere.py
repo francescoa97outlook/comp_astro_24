@@ -139,7 +139,6 @@ class Atmosphere:
         Returns:
             None
         """
-
         # Now lets point the xsection and cia cachers to our files:
         OpacityCache().clear_cache()
         OpacityCache().set_opacity_path(str(Path(self.input_folder, self.atmosphere_yaml_file.get("xsec_path"))))
@@ -201,7 +200,6 @@ class Atmosphere:
         Returns:
             None
         """
-
         self.wngrid = np.sort(10000 / np.logspace(-0.4, 1.1, 1000))
         self.binner = SimpleBinner(wngrid=self.wngrid)
     
@@ -231,7 +229,6 @@ class Atmosphere:
         Returns:
             None
         """
-
         # BUILDING THE MODEL
         if type_model == "Transmission":
             self.model = TransmissionModel(
@@ -317,7 +314,7 @@ class Atmosphere:
                 None
         """
         if self.plot:
-            fig, ax = plt.subplots(1, 1, figsize = (12, 8))
+            fig, ax = plt.subplots(1, 1, figsize=(12, 8))
             #
             for x, gasname in enumerate(self.model.chemistry.activeGases):
                 ax.plot(
@@ -362,7 +359,7 @@ class Atmosphere:
                 None
         """
         if self.plot:
-            fig, ax = plt.subplots(1, 1, figsize = (12, 8))
+            fig, ax = plt.subplots(1, 1, figsize=(12, 8))
             wn, ratio_rp_rs, tau, _ = result_model
             ax.plot(10000 / wn, ratio_rp_rs)
             ax.set_xlabel("Wavelengths (um)")
@@ -377,7 +374,6 @@ class Atmosphere:
             data = np.column_stack((10000 / wn, ratio_rp_rs, ratio_rp_rs_pow))
             # Save to a .dat file without an empty first row
             np.savetxt(self.output_file + "_spectrum.dat", data, fmt="%.15e", comments="")
-
 
     def compare_models(self, binning=False):
         """
@@ -411,7 +407,7 @@ class Atmosphere:
             self.build_model("Direct Image")
             dim_model = self.calculate_model(binning)
             #
-            fig, ax = plt.subplots(3, 1, figsize = (12, 8), constrained_layout=True)
+            fig, ax = plt.subplots(3, 1, figsize=(12, 8), constrained_layout=True)
             wn, ratio_rp_rs, _, _ = tm_model
             ax[0].plot(10000 / wn, ratio_rp_rs)
             #
@@ -432,4 +428,3 @@ class Atmosphere:
             ax[2].set_ylabel("Ratio planet-stellar radii")
             plt.savefig(self.output_file + "_compare.png")
             plt.close(fig)
-

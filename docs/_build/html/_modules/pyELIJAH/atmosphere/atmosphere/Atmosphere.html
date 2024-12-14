@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyELIJAH.atmosphere.atmosphere.Atmosphere &mdash; pyELIJAH 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyELIJAH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">pyELIJAH</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyELIJAH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyELIJAH.atmosphere.atmosphere.Atmosphere</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyELIJAH.atmosphere.atmosphere.Atmosphere</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">taurex.log</span>
+
+<span class="n">taurex</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">disableLogging</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">taurex.cache</span> <span class="kn">import</span> <span class="n">OpacityCache</span><span class="p">,</span> <span class="n">CIACache</span>
+<span class="kn">from</span> <span class="nn">taurex.temperature</span> <span class="kn">import</span> <span class="n">Guillot2010</span>
+<span class="kn">from</span> <span class="nn">taurex.planet</span> <span class="kn">import</span> <span class="n">Planet</span>
+<span class="kn">from</span> <span class="nn">taurex.stellar</span> <span class="kn">import</span> <span class="n">BlackbodyStar</span>
+<span class="kn">from</span> <span class="nn">taurex.chemistry</span> <span class="kn">import</span> <span class="n">TaurexChemistry</span>
+<span class="kn">from</span> <span class="nn">taurex.chemistry</span> <span class="kn">import</span> <span class="n">ConstantGas</span>
+<span class="kn">from</span> <span class="nn">taurex.model</span> <span class="kn">import</span> <span class="n">TransmissionModel</span>
+<span class="kn">from</span> <span class="nn">taurex.contributions</span> <span class="kn">import</span> <span class="n">AbsorptionContribution</span>
+<span class="kn">from</span> <span class="nn">taurex.contributions</span> <span class="kn">import</span> <span class="n">CIAContribution</span>
+<span class="kn">from</span> <span class="nn">taurex.contributions</span> <span class="kn">import</span> <span class="n">RayleighContribution</span>
+<span class="kn">from</span> <span class="nn">taurex.model</span> <span class="kn">import</span> <span class="n">EmissionModel</span><span class="p">,</span> <span class="n">DirectImageModel</span>
+<span class="kn">from</span> <span class="nn">taurex.binning</span> <span class="kn">import</span> <span class="n">SimpleBinner</span>
+<span class="kn">from</span> <span class="nn">taurex.temperature</span> <span class="kn">import</span> <span class="n">Isothermal</span>
+
+
+<div class="viewcode-block" id="Atmosphere">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.atmosphere.html#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere">[docs]</a>
+<span class="k">class</span> <span class="nc">Atmosphere</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A class for generating and analyzing atmospheric models based on input</span>
+<span class="sd">        configurations for planets and their atmospheres. It uses Taurex module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_folder</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">,</span> <span class="n">atmosphere_yaml_file</span><span class="p">,</span> <span class="n">planet_yaml</span><span class="p">,</span> <span class="n">i_atmo</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Initializes the Atmosphere class to process and analyze atmospheric models for planets.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                input_folder:</span>
+<span class="sd">                    A string representing the path to the folder containing input YAML files.</span>
+<span class="sd">                output_folder:</span>
+<span class="sd">                    A string representing the path to the folder where output files will be saved.</span>
+<span class="sd">                atmosphere_yaml_file:</span>
+<span class="sd">                    A dictionary containing the YAML configuration for the atmosphere.</span>
+<span class="sd">                    This includes information such as the output file name for the atmosphere</span>
+<span class="sd">                    and model-specific parameters.</span>
+<span class="sd">                planet_yaml:</span>
+<span class="sd">                    An instance of the `Parameters` class containing the planet&#39;s</span>
+<span class="sd">                    configuration and associated properties.</span>
+<span class="sd">                i_atmo:</span>
+<span class="sd">                    An integer representing the index of the atmosphere being processed,</span>
+<span class="sd">                    used for naming outputs.</span>
+<span class="sd">                plot:</span>
+<span class="sd">                    A boolean flag indicating whether to generate plots during processing.</span>
+<span class="sd">                    Default is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_folder</span> <span class="o">=</span> <span class="n">input_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span> <span class="o">=</span> <span class="n">output_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span> <span class="o">=</span> <span class="n">atmosphere_yaml_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span> <span class="o">=</span> <span class="n">planet_yaml</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index_atmosphere</span> <span class="o">=</span> <span class="n">i_atmo</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_atmosphere_file&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_atmosphere_file&quot;</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;_Atmosphere_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index_atmosphere</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planet</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">star</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chemistry</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperature_profile</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_sections</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wngrid</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Atmosphere.generate_profiles">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.atmosphere.html#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.generate_profiles">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates the necessary profiles for the atmosphere, planet,</span>
+<span class="sd">        and star based on the YAML configuration files.</span>
+
+<span class="sd">        Args:</span>
+
+
+<span class="sd">        Workflow:</span>
+<span class="sd">            - Checks the &quot;temperature_profile&quot; key in `atmosphere_yaml_file`:</span>
+<span class="sd">                - If &quot;isothermal&quot;, initializes an `Isothermal` temperature profile</span>
+<span class="sd">                  using the planet&#39;s equilibrium temperature.</span>
+<span class="sd">                - Otherwise, initializes a `Guillot2010` temperature profile.</span>
+<span class="sd">            - Assigns the planet&#39;s name from the YAML configuration.</span>
+<span class="sd">            - Initializes the planet&#39;s properties (`Planet`) using radius</span>
+<span class="sd">              and mass from `planet_yaml`.</span>
+<span class="sd">            - Initializes the star&#39;s properties (`BlackbodyStar`) using temperature</span>
+<span class="sd">              and radius from `planet_yaml`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># PROFILES</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;temperature_profile&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;isothermal&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">temperature_profile</span> <span class="o">=</span> <span class="n">Isothermal</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;planet_temperature_eq&quot;</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">temperature_profile</span> <span class="o">=</span> <span class="n">Guillot2010</span><span class="p">(</span><span class="n">T_irr</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;planet_temperature_eq&quot;</span><span class="p">)))</span>
+        <span class="c1"># Guillot profile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;planet_name&quot;</span><span class="p">)</span>
+        <span class="c1"># Planets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planet</span> <span class="o">=</span> <span class="n">Planet</span><span class="p">(</span>
+            <span class="n">planet_radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;planet_radius&quot;</span><span class="p">)),</span>
+            <span class="n">planet_mass</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;planet_mass&quot;</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="c1"># Planet star</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">star</span> <span class="o">=</span> <span class="n">BlackbodyStar</span><span class="p">(</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stellar_temperature&quot;</span><span class="p">)),</span>
+            <span class="n">radius</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stellar_radius&quot;</span><span class="p">))</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># noinspection PyUnresolvedReferences</span>
+<div class="viewcode-block" id="Atmosphere.read_opacities_and_create_chemistry">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.atmosphere.html#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.read_opacities_and_create_chemistry">[docs]</a>
+    <span class="k">def</span> <span class="nf">read_opacities_and_create_chemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads opacity data, sets up chemistry models, and generates</span>
+<span class="sd">        cross-section plots if required.</span>
+
+<span class="sd">        Args:</span>
+
+
+<span class="sd">        Workflow:</span>
+<span class="sd">            - Clears any cached opacity data and sets the paths for cross-section</span>
+<span class="sd">              (`xsec_path`) and CIA (`hitran_path`) files.</span>
+<span class="sd">            - Initializes a free chemistry model (`TaurexChemistry`)</span>
+<span class="sd">              with fill gases and a mixing ratio.</span>
+<span class="sd">            - Iterates over the molecules specified in `dict_molecs`:</span>
+<span class="sd">                - Computes the mixing ratio for each molecule based on the configuration.</span>
+<span class="sd">                - Adds the molecule as a constant gas to the chemistry model.</span>
+<span class="sd">                - If plotting is enabled, logs the mixing ratio and plots the</span>
+<span class="sd">                cross-section for each molecule.</span>
+<span class="sd">            - Handles exceptions for missing molecules in HITRAN and logs a</span>
+<span class="sd">              message if plotting is enabled.</span>
+<span class="sd">            - If `plot` is enabled:</span>
+<span class="sd">                - Creates and saves cross-section plots for each molecule,</span>
+<span class="sd">                  showing wave number vs cross-section for specific temperature</span>
+<span class="sd">                  and pressure conditions.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Now lets point the xsection and cia cachers to our files:</span>
+        <span class="n">OpacityCache</span><span class="p">()</span><span class="o">.</span><span class="n">clear_cache</span><span class="p">()</span>
+        <span class="n">OpacityCache</span><span class="p">()</span><span class="o">.</span><span class="n">set_opacity_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xsec_path&quot;</span><span class="p">))))</span>
+        <span class="n">CIACache</span><span class="p">()</span><span class="o">.</span><span class="n">set_cia_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hitran_path&quot;</span><span class="p">))))</span>
+        <span class="n">dict_molecs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dict_molecs&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_sections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Free chemistry model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chemistry</span> <span class="o">=</span> <span class="n">TaurexChemistry</span><span class="p">(</span><span class="n">fill_gases</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_gases&quot;</span><span class="p">),</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.172</span><span class="p">)</span>
+        <span class="n">temp_press_mix</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">molecs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dict_molecs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">molec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">molecs</span><span class="p">):</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">dict_molecs</span><span class="p">[</span><span class="n">molec</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;random_molecule&quot;</span><span class="p">)):</span>
+                <span class="n">mix_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="nb">float</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="mi">10</span><span class="o">**</span><span class="nb">float</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mix_ratio</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="nb">float</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chemistry</span><span class="o">.</span><span class="n">addGas</span><span class="p">(</span><span class="n">ConstantGas</span><span class="p">(</span>
+                <span class="n">molec</span><span class="p">,</span> <span class="n">mix_ratio</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">mix_ratio</span><span class="p">)</span>
+            <span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">molec</span><span class="si">}</span><span class="s2"> mixing ratio: </span><span class="si">{</span><span class="n">mix_ratio</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">temp_press_mix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cross_sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OpacityCache</span><span class="p">()[</span><span class="n">molec</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">molec</span> <span class="o">+</span> <span class="s2">&quot; not found in hitran&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cross_sect</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_sections</span><span class="p">):</span>
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Wave number&quot;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Cross section&quot;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot; cross sections &quot;</span> <span class="o">+</span> <span class="n">molecs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                    <span class="mi">10000</span> <span class="o">/</span> <span class="n">cross_sect</span><span class="o">.</span><span class="n">wavenumberGrid</span><span class="p">,</span>
+                    <span class="n">cross_sect</span><span class="o">.</span><span class="n">opacity</span><span class="p">(</span><span class="n">temp_press_mix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">10</span><span class="o">**</span><span class="n">temp_press_mix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span>
+                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">molecs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">, T=</span><span class="si">{</span><span class="n">temp_press_mix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> K, P=</span><span class="si">{</span><span class="mi">10</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="n">temp_press_mix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> Pa&quot;</span><span class="p">,</span>
+                    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span>
+                <span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+                <span class="c1">#</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">molecs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">_cross_sections.png&quot;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
+
+        <span class="c1">#</span>
+
+<div class="viewcode-block" id="Atmosphere.create_binning_obj">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.atmosphere.html#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.create_binning_obj">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_binning_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a binning object and initializes the wavenumber grid.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">        Workflow:</span>
+<span class="sd">            - Generates a sorted wavenumber grid (`wngrid`) by converting from</span>
+<span class="sd">              logarithmic wavelength spacing.</span>
+<span class="sd">            - Initializes a `SimpleBinner` object using the generated `wngrid`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">wngrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="mi">10000</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binner</span> <span class="o">=</span> <span class="n">SimpleBinner</span><span class="p">(</span><span class="n">wngrid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wngrid</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Atmosphere.build_model">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.atmosphere.html#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.build_model">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_model</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the atmospheric model based on the specified model type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            type_model:</span>
+<span class="sd">                A string specifying the type of model to build. Options are:</span>
+<span class="sd">                - &quot;Transmission&quot;: Builds a `TransmissionModel`.</span>
+<span class="sd">                - &quot;Emission&quot;: Builds an `EmissionModel`.</span>
+<span class="sd">                - Any other value defaults to a `DirectImageModel`.</span>
+
+<span class="sd">        Workflow:</span>
+<span class="sd">            - Initializes the model object based on the provided `type_model` using the planet,</span>
+<span class="sd">              temperature profile, chemistry, star, and atmospheric</span>
+<span class="sd">              pressure range from `atmosphere_yaml_file`.</span>
+<span class="sd">            - Adds the following contributions to the model:</span>
+<span class="sd">                - Absorption contributions (`AbsorptionContribution`).</span>
+<span class="sd">                - CIA contributions (`CIAContribution`) based on `cia_pairs`</span>
+<span class="sd">                  from the YAML configuration.</span>
+<span class="sd">                - Rayleigh scattering contributions (`RayleighContribution`).</span>
+<span class="sd">            - Calls the `build` method on the model to set up all the profiles and</span>
+<span class="sd">              prepare the model for further calculations.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># BUILDING THE MODEL</span>
+        <span class="k">if</span> <span class="n">type_model</span> <span class="o">==</span> <span class="s2">&quot;Transmission&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">TransmissionModel</span><span class="p">(</span>
+                <span class="n">planet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">planet</span><span class="p">,</span>
+                <span class="n">temperature_profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature_profile</span><span class="p">,</span>
+                <span class="n">chemistry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chemistry</span><span class="p">,</span>
+                <span class="n">star</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">star</span><span class="p">,</span>
+                <span class="n">atm_min_pressure</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;atm_min_pressure&quot;</span><span class="p">)),</span>
+                <span class="n">atm_max_pressure</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;atm_max_pressure&quot;</span><span class="p">)),</span>
+                <span class="n">nlayers</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nlayers&quot;</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">type_model</span> <span class="o">==</span> <span class="s2">&quot;Emission&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">EmissionModel</span><span class="p">(</span>
+                <span class="n">planet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">planet</span><span class="p">,</span>
+                <span class="n">temperature_profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature_profile</span><span class="p">,</span>
+                <span class="n">chemistry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chemistry</span><span class="p">,</span>
+                <span class="n">star</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">star</span><span class="p">,</span>
+                <span class="n">atm_min_pressure</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;atm_min_pressure&quot;</span><span class="p">)),</span>
+                <span class="n">atm_max_pressure</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;atm_max_pressure&quot;</span><span class="p">)),</span>
+                <span class="n">nlayers</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nlayers&quot;</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">DirectImageModel</span><span class="p">(</span>
+                <span class="n">planet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">planet</span><span class="p">,</span>
+                <span class="n">temperature_profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature_profile</span><span class="p">,</span>
+                <span class="n">chemistry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chemistry</span><span class="p">,</span>
+                <span class="n">star</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">star</span><span class="p">,</span>
+                <span class="n">atm_min_pressure</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;atm_min_pressure&quot;</span><span class="p">)),</span>
+                <span class="n">atm_max_pressure</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;atm_max_pressure&quot;</span><span class="p">)),</span>
+                <span class="n">nlayers</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nlayers&quot;</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="c1"># Add absorption contribution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_contribution</span><span class="p">(</span><span class="n">AbsorptionContribution</span><span class="p">())</span>
+        <span class="c1"># And some CIA for good measure:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_contribution</span><span class="p">(</span>
+            <span class="n">CIAContribution</span><span class="p">(</span><span class="n">cia_pairs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cia_pairs&quot;</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="c1"># And rayleigh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_contribution</span><span class="p">(</span><span class="n">RayleighContribution</span><span class="p">())</span>
+        <span class="c1"># Build it to setup all the profiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">build</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Atmosphere.calculate_model">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.atmosphere.html#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.calculate_model">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binning</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wavenumberGrid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the atmospheric model, with optional binning of the results.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            binning:</span>
+<span class="sd">                A boolean indicating whether to apply binning to the calculated model.</span>
+<span class="sd">                Default is False.</span>
+<span class="sd">            wavenumberGrid:</span>
+<span class="sd">                An optional array specifying the wavenumber grid to use for the model calculation.</span>
+<span class="sd">                If None, the default grid is used.</span>
+
+<span class="sd">        Workflow:</span>
+<span class="sd">            - If `binning` is True, bins the model output using the `SimpleBinner` object.</span>
+<span class="sd">            - If `binning` is False, calculates the model directly on the specified or</span>
+<span class="sd">              default wavenumber grid.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The calculated atmospheric model, either binned or unbinned,</span>
+<span class="sd">            depending on the `binning` argument.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">binning</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binner</span><span class="o">.</span><span class="n">bin_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">wavenumberGrid</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">wavenumberGrid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Atmosphere.plot_gases">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.atmosphere.html#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.plot_gases">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_gases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the mixing ratios of active and inactive gases in the atmosphere.</span>
+
+<span class="sd">            Args:</span>
+
+<span class="sd">            Workflow:</span>
+<span class="sd">                - Creates a plot showing the mixing ratios of active and</span>
+<span class="sd">                 inactive gases against the pressure profile.</span>
+<span class="sd">                - Uses logarithmic scaling for both axes.</span>
+<span class="sd">                - Inverts the y-axis to represent pressure decreasing with altitude.</span>
+<span class="sd">                - Saves the plot as an image file named &quot;&lt;output_file&gt;_gases.png&quot;.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+            <span class="c1">#</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">gasname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">chemistry</span><span class="o">.</span><span class="n">activeGases</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">chemistry</span><span class="o">.</span><span class="n">activeGasMixProfile</span><span class="p">[</span><span class="n">x</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pressureProfile</span> <span class="o">/</span> <span class="mf">1e5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">gasname</span>
+                <span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">gasname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">chemistry</span><span class="o">.</span><span class="n">inactiveGases</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">chemistry</span><span class="o">.</span><span class="n">inactiveGasMixProfile</span><span class="p">[</span><span class="n">x</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pressureProfile</span> <span class="o">/</span> <span class="mf">1e5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">gasname</span>
+                <span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Mix in ratio&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Pressure (Pa)&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot; atmosphere chemistry&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;_gases.png&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Atmosphere.plot_flux">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.atmosphere.html#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.plot_flux">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_flux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result_model</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the calculated flux spectrum and saves it as an image and data file.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                result_model:</span>
+<span class="sd">                    A tuple containing:</span>
+<span class="sd">                        - `wn`: Wavenumber grid.</span>
+<span class="sd">                        - `ratio_rp_rs`: Ratio of planet-to-stellar radii.</span>
+<span class="sd">                        - `tau`: Optical depth (unused in plotting).</span>
+<span class="sd">                        - Additional model output (unused in plotting).</span>
+
+<span class="sd">            Workflow:</span>
+<span class="sd">                - Plots the ratio of planet-to-stellar radii against the wavelength.</span>
+<span class="sd">                - Saves the plot as an image file named &quot;&lt;output_file&gt;_flux.png&quot;.</span>
+<span class="sd">                - Saves the flux data to a `.dat` file with columns: wavelength,</span>
+<span class="sd">                radius ratio, and an estimated uncertainty.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+            <span class="n">wn</span><span class="p">,</span> <span class="n">ratio_rp_rs</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">result_model</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">10000</span> <span class="o">/</span> <span class="n">wn</span><span class="p">,</span> <span class="n">ratio_rp_rs</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Wavelengths (um)&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ratio planet-stellar radii&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot; flux&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;_flux.png&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+            <span class="c1"># File path</span>
+            <span class="c1"># Write to file</span>
+            <span class="n">ratio_rp_rs_pow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ratio_rp_rs</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ratio_rp_rs</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="mi">10000</span> <span class="o">/</span> <span class="n">wn</span><span class="p">,</span> <span class="n">ratio_rp_rs</span><span class="p">,</span> <span class="n">ratio_rp_rs_pow</span><span class="p">))</span>
+            <span class="c1"># Save to a .dat file without an empty first row</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;_spectrum.dat&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.15e</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Atmosphere.compare_models">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.atmosphere.html#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.compare_models">[docs]</a>
+    <span class="k">def</span> <span class="nf">compare_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binning</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares the calculated atmospheric models for Transmission, Emission,</span>
+<span class="sd">        and Direct Imaging.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            binning:</span>
+<span class="sd">                A boolean indicating whether to apply binning to the calculated models.</span>
+<span class="sd">                Default is False.</span>
+
+<span class="sd">        Workflow:</span>
+<span class="sd">            - Builds and calculates the atmospheric model for &quot;Transmission&quot;.</span>
+<span class="sd">            - Builds and calculates the atmospheric model for &quot;Emission&quot;.</span>
+<span class="sd">            - Builds and calculates the atmospheric model for &quot;Direct Image&quot;.</span>
+<span class="sd">            - Plots the ratio of planet-to-stellar radii for each model against the wavelength.</span>
+<span class="sd">            - Creates a subplot for each model:</span>
+<span class="sd">                - The first subplot displays the Transmission model.</span>
+<span class="sd">                - The second subplot displays the Emission model.</span>
+<span class="sd">                - The third subplot displays the Direct Image model.</span>
+<span class="sd">            - Saves the comparison plot as an image file named &quot;&lt;output_file&gt;_compare.png&quot;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_model</span><span class="p">(</span><span class="s2">&quot;Transmission&quot;</span><span class="p">)</span>
+            <span class="n">tm_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_model</span><span class="p">(</span><span class="n">binning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_model</span><span class="p">(</span><span class="s2">&quot;Emission&quot;</span><span class="p">)</span>
+            <span class="n">em_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_model</span><span class="p">(</span><span class="n">binning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_model</span><span class="p">(</span><span class="s2">&quot;Direct Image&quot;</span><span class="p">)</span>
+            <span class="n">dim_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_model</span><span class="p">(</span><span class="n">binning</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">wn</span><span class="p">,</span> <span class="n">ratio_rp_rs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tm_model</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">10000</span> <span class="o">/</span> <span class="n">wn</span><span class="p">,</span> <span class="n">ratio_rp_rs</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="n">wn</span><span class="p">,</span> <span class="n">ratio_rp_rs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">em_model</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">10000</span> <span class="o">/</span> <span class="n">wn</span><span class="p">,</span> <span class="n">ratio_rp_rs</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="n">wn</span><span class="p">,</span> <span class="n">ratio_rp_rs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dim_model</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">10000</span> <span class="o">/</span> <span class="n">wn</span><span class="p">,</span> <span class="n">ratio_rp_rs</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Transmission&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Wavelength (um)&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ratio planet-stellar radii&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Emission&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Wavelength (um)&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ratio planet-stellar radii&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Direct Image&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Wavelength (um)&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ratio planet-stellar radii&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;_compare.png&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francesco Amadori, Paula Manuela Leguizamon Pineda, Leonardo Dal Cin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

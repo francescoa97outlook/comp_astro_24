@@ -1,0 +1,546 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyELIJAH.atmosphere.retrieval.Retrieval &mdash; pyELIJAH 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyELIJAH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">pyELIJAH</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyELIJAH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyELIJAH.atmosphere.retrieval.Retrieval</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyELIJAH.atmosphere.retrieval.Retrieval</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">corner</span> <span class="kn">import</span> <span class="n">corner</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colormaps</span> <span class="k">as</span> <span class="n">cmp</span>
+<span class="kn">from</span> <span class="nn">taurex.data.spectrum</span> <span class="kn">import</span> <span class="n">ObservedSpectrum</span>
+<span class="kn">from</span> <span class="nn">taurex.optimizer.nestle</span> <span class="kn">import</span> <span class="n">NestleOptimizer</span>
+<span class="kn">import</span> <span class="nn">taurex.log</span>
+<span class="n">taurex</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">disableLogging</span><span class="p">()</span>
+
+<span class="kn">from</span> <span class="nn">pyELIJAH.atmosphere.atmosphere.run_atmosphere</span> <span class="kn">import</span> <span class="n">atmosphere_exc</span>
+
+
+<div class="viewcode-block" id="Retrieval">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.retrieval.html#pyELIJAH.atmosphere.retrieval.Retrieval.Retrieval">[docs]</a>
+<span class="k">class</span> <span class="nc">Retrieval</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A class for performing retrieval calculations for atmospheric models.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_folder</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">,</span> <span class="n">retrieval_file</span><span class="p">,</span> <span class="n">atmosphere_yaml_file</span><span class="p">,</span> <span class="n">planet_yaml</span><span class="p">,</span> <span class="n">i_ret</span><span class="p">,</span> <span class="n">parallel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            input_folder:</span>
+<span class="sd">                A string representing the path to the folder containing input YAML files.</span>
+<span class="sd">            output_folder:</span>
+<span class="sd">                A string representing the path to the folder where output files will be saved.</span>
+<span class="sd">            retrieval_file:</span>
+<span class="sd">                A dictionary or YAML file containing the retrieval configuration.</span>
+<span class="sd">            atmosphere_yaml_file:</span>
+<span class="sd">                A dictionary or YAML file containing the atmospheric configuration.</span>
+<span class="sd">            planet_yaml:</span>
+<span class="sd">                A dictionary or YAML file containing the planet&#39;s configuration.</span>
+<span class="sd">            i_ret:</span>
+<span class="sd">                An integer representing the index of the retrieval, used for naming outputs.</span>
+<span class="sd">            parallel:</span>
+<span class="sd">                A flag used to define if the procedure needs to be parallelized or not</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_folder</span> <span class="o">=</span> <span class="n">input_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span> <span class="o">=</span> <span class="n">output_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieval_file</span> <span class="o">=</span> <span class="n">retrieval_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span> <span class="o">=</span> <span class="n">atmosphere_yaml_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span> <span class="o">=</span> <span class="n">planet_yaml</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;planet_name&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_process</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_process</span> <span class="o">=</span> <span class="n">i_ret</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index_retrieval</span> <span class="o">=</span> <span class="n">i_ret</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieval_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_retrieval_file&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieval_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_retrieval_file&quot;</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;_Retrieval_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index_retrieval</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">cmp</span><span class="p">[</span><span class="s2">&quot;inferno&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colors</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+        <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radiative_mod</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binned_spectrum</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Retrieval.calculate_radiative_model">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.retrieval.html#pyELIJAH.atmosphere.retrieval.Retrieval.Retrieval.calculate_radiative_model">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate_radiative_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the radiative model for the retrieval process.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">        Workflow:</span>
+<span class="sd">            - Executes the `atmosphere_exc` function to calculate the atmospheric model.</span>
+<span class="sd">                - Inputs include the folder paths, atmosphere and planet</span>
+<span class="sd">                configurations, and settings.</span>
+<span class="sd">                - The `plot` argument is set to `False` to suppress visual</span>
+<span class="sd">                outputs during this step.</span>
+<span class="sd">            - Retrieves the type of radiative model to be used (`radiative_mod`)</span>
+<span class="sd">            from the atmospheric YAML configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span> <span class="o">=</span> <span class="n">atmosphere_exc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">planet_yaml</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radiative_mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;radiative_mod&quot;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Retrieval.plot_observed_spectrum">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.retrieval.html#pyELIJAH.atmosphere.retrieval.Retrieval.Retrieval.plot_observed_spectrum">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_observed_spectrum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the observed spectrum and compares it with the calculated</span>
+<span class="sd">        radiative model.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">        Workflow:</span>
+<span class="sd">            - Builds the atmospheric model using the specified radiative model</span>
+<span class="sd">            type (`radiative_mod`).</span>
+<span class="sd">            - Loads the observed spectrum from the file specified in the retrieval</span>
+<span class="sd">            YAML configuration (`path_spectrum`).</span>
+<span class="sd">            - Creates a binned version of the observed spectrum using `create_binner`.</span>
+<span class="sd">            - Generates a plot:</span>
+<span class="sd">                - The observed spectrum is displayed with error bars.</span>
+<span class="sd">                - The calculated model spectrum is plotted for comparison.</span>
+<span class="sd">            - Sets plot labels, titles, and legend.</span>
+<span class="sd">            - Saves the plot as an image file named &quot;&lt;output_file&gt;_raw_model.png&quot;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">build_model</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">radiative_mod</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span> <span class="o">=</span> <span class="n">ObservedSpectrum</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieval_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path_spectrum&quot;</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">index_process</span><span class="p">]</span>
+        <span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binned_spectrum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">create_binner</span><span class="p">()</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavelengthGrid</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">spectrum</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">errorBar</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Observed Spectrum&#39;</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavelengthGrid</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">binned_spectrum</span><span class="o">.</span><span class="n">bin_model</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">calculate_model</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavenumberGrid</span>
+                <span class="p">))[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radiative_mod</span> <span class="o">+</span> <span class="s2">&quot; model&quot;</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Wavelengths (um)&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Pressure&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot; observed vs model - Raw&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;_raw_model.png&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Observed spectrum plotted&quot;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># noinspection PyTypeChecker,PyUnresolvedReferences</span>
+<div class="viewcode-block" id="Retrieval.retrieval">
+<a class="viewcode-back" href="../../../../pyELIJAH.atmosphere.retrieval.html#pyELIJAH.atmosphere.retrieval.Retrieval.Retrieval.retrieval">[docs]</a>
+    <span class="k">def</span> <span class="nf">retrieval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs the retrieval process to fit the observed spectrum</span>
+<span class="sd">        to a radiative model.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">        Workflow:</span>
+<span class="sd">            - Prompts the user to select parameters to fit from the available</span>
+<span class="sd">            model parameters.</span>
+<span class="sd">            - Configures the optimizer based on the retrieval configuration</span>
+<span class="sd">            (`MultiNestOptimizer` or `NestleOptimizer`).</span>
+<span class="sd">            - Sets up the forward model and the observed spectrum for fitting.</span>
+<span class="sd">            - Enables fitting for the chosen parameters and sets their</span>
+<span class="sd">            boundary conditions based on user input.</span>
+<span class="sd">            - Runs the optimizer to find solutions and iteratively</span>
+<span class="sd">            updates the model with optimized parameters.</span>
+<span class="sd">            - For each iteration:</span>
+<span class="sd">                - Compares the observed spectrum with the model spectrum.</span>
+<span class="sd">                - Generates and saves plots for the observed spectrum,</span>
+<span class="sd">                the model spectrum, and their differences.</span>
+<span class="sd">                - Outputs the retrieval results in a corner plot and saves</span>
+<span class="sd">                it as an image.</span>
+<span class="sd">                - Saves the results, including observed data, model spectra,</span>
+<span class="sd">                and optimized parameters, to a `.pkl` file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#</span>
+        <span class="c1">#</span>
+        <span class="c1"># Which parameters to fit and their prior boundaries:</span>
+        <span class="n">selected_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">selected_boundaries</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">parameters_to_fit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere_yaml_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;parameters_to_fit&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">parameters_to_fit</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">selected_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+            <span class="n">selected_boundaries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parameters_to_fit</span><span class="p">[</span><span class="n">param</span><span class="p">])</span>
+        <span class="c1"># -------------------------------------------------------------------- #</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">NestleOptimizer</span><span class="p">(</span>
+            <span class="n">num_live_points</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">retrieval_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_live_points&quot;</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="c1"># Forward model and observation:</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">set_observed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_params</span><span class="p">)):</span>
+            <span class="n">boundaries</span> <span class="o">=</span> <span class="n">selected_boundaries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">enable_fit</span><span class="p">(</span><span class="n">selected_params</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">set_boundary</span><span class="p">(</span>
+                <span class="n">selected_params</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">boundaries</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">boundaries</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="p">)</span>
+        <span class="c1"># Lets loop and plot each solution!</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+        <span class="c1"># -------------------------------------------------------------------- #</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">solution</span><span class="p">,</span> <span class="n">optimized_map</span><span class="p">,</span> <span class="n">optimized_value</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">opt</span><span class="o">.</span><span class="n">get_solution</span><span class="p">():</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">update_model</span><span class="p">(</span><span class="n">optimized_map</span><span class="p">)</span>
+            <span class="n">spectra</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">binned_spectrum</span><span class="o">.</span><span class="n">bin_model</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">calculate_model</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavenumberGrid</span>
+                <span class="p">)</span>
+            <span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1">#</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planet_name</span> <span class="o">+</span> <span class="s2">&quot; observed vs model - Iteration: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavelengthGrid</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">spectrum</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">errorBar</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Observed Spectrum&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span>
+            <span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ratio planet-stellar radii&quot;</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="c1">#</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavelengthGrid</span><span class="p">,</span>
+                <span class="n">spectra</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radiative_mod</span> <span class="o">+</span> <span class="s2">&quot; model&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span>
+            <span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ratio planet-stellar radii&quot;</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="c1">#</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavelengthGrid</span><span class="p">,</span>
+                <span class="n">spectra</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radiative_mod</span> <span class="o">+</span> <span class="s2">&quot; model&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span>
+            <span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavelengthGrid</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">spectrum</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">errorBar</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Observed Spectrum&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span>
+            <span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ratio planet-stellar radii&quot;</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="c1">#</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavelengthGrid</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">spectrum</span> <span class="o">-</span> <span class="n">spectra</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Difference between observed and model&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span>
+            <span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Wavelength (um)&#39;</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Ratio planet-stellar radii&quot;</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="c1">#</span>
+            <span class="n">string_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_Iteration_</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">string_output</span> <span class="o">+</span> <span class="s2">&quot;_results_comparison.png&quot;</span><span class="p">)</span>
+            <span class="c1"># plt.show()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Retrieval results:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+            <span class="n">list_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">list_distributions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+                <span class="n">list_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="n">list_distributions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;trace&quot;</span><span class="p">])</span>
+            <span class="c1">#</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+            <span class="n">corner</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">list_distributions</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">list_names</span><span class="p">,</span> <span class="n">show_titles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">title_fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span>
+                <span class="n">string_output</span> <span class="o">+</span> <span class="s2">&quot;_corner_plot.png&quot;</span>
+            <span class="p">)))</span>
+            <span class="c1"># plt.show()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">string_output</span> <span class="o">+</span> <span class="s2">&quot;_results.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">wavelengthGrid</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">spectrum</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observed_spectrum</span><span class="o">.</span><span class="n">errorBar</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">spectra</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">optimized_map</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">optimized_value</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># # noinspection PyTypeChecker,PyUnresolvedReferences</span>
+    <span class="c1"># def retrieval(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     Performs the retrieval process to fit the observed spectrum</span>
+    <span class="c1">#     to a radiative model.</span>
+    <span class="c1">#</span>
+    <span class="c1">#     Args:</span>
+    <span class="c1">#</span>
+    <span class="c1">#     Workflow:</span>
+    <span class="c1">#         - Prompts the user to select parameters to fit from the available</span>
+    <span class="c1">#         model parameters.</span>
+    <span class="c1">#         - Configures the optimizer based on the retrieval configuration</span>
+    <span class="c1">#         (`MultiNestOptimizer` or `NestleOptimizer`).</span>
+    <span class="c1">#         - Sets up the forward model and the observed spectrum for fitting.</span>
+    <span class="c1">#         - Enables fitting for the chosen parameters and sets their</span>
+    <span class="c1">#         boundary conditions based on user input.</span>
+    <span class="c1">#         - Runs the optimizer to find solutions and iteratively</span>
+    <span class="c1">#         updates the model with optimized parameters.</span>
+    <span class="c1">#         - For each iteration:</span>
+    <span class="c1">#             - Compares the observed spectrum with the model spectrum.</span>
+    <span class="c1">#             - Generates and saves plots for the observed spectrum,</span>
+    <span class="c1">#             the model spectrum, and their differences.</span>
+    <span class="c1">#             - Outputs the retrieval results in a corner plot and saves</span>
+    <span class="c1">#             it as an image.</span>
+    <span class="c1">#             - Saves the results, including observed data, model spectra,</span>
+    <span class="c1">#             and optimized parameters, to a `.pkl` file.</span>
+    <span class="c1">#</span>
+    <span class="c1">#     Returns:</span>
+    <span class="c1">#         None</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     #</span>
+    <span class="c1">#     rank = None</span>
+    <span class="c1">#     selected_params = None</span>
+    <span class="c1">#     selected_boundaries = None</span>
+    <span class="c1">#     do_mpi = int(self.retrieval_file.get(&quot;mpi&quot;))</span>
+    <span class="c1">#     if do_mpi:</span>
+    <span class="c1">#         comm = MPI.COMM_WORLD</span>
+    <span class="c1">#         rank = comm.Get_rank()</span>
+    <span class="c1">#     rank_0_or_no_mpi = rank == 0 or not do_mpi</span>
+    <span class="c1">#     #</span>
+    <span class="c1">#     if rank_0_or_no_mpi:</span>
+    <span class="c1">#         # Which parameters to fit and their prior boundaries:</span>
+    <span class="c1">#         selected_params = list()</span>
+    <span class="c1">#         selected_boundaries = list()</span>
+    <span class="c1">#         parameters_to_fit = self.atmosphere_yaml_file.get(&quot;parameters_to_fit&quot;)</span>
+    <span class="c1">#         for param in list(parameters_to_fit.keys()):</span>
+    <span class="c1">#             selected_params.append(param)</span>
+    <span class="c1">#             selected_boundaries.append(parameters_to_fit[param])</span>
+    <span class="c1">#     # -------------------------------------------------------------------- #</span>
+    <span class="c1">#     if do_mpi:</span>
+    <span class="c1">#         opt = MultiNestOptimizer(</span>
+    <span class="c1">#             multi_nest_path=self.output_folder,</span>
+    <span class="c1">#             num_live_points=int(self.retrieval_file.get(&quot;num_live_points&quot;)),</span>
+    <span class="c1">#         )</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         opt = NestleOptimizer(</span>
+    <span class="c1">#             num_live_points=int(self.retrieval_file.get(&quot;num_live_points&quot;)),</span>
+    <span class="c1">#         )</span>
+    <span class="c1">#     # Forward model and observation:</span>
+    <span class="c1">#     opt.set_model(self.atmosphere.model)</span>
+    <span class="c1">#     opt.set_observed(self.observed_spectrum)</span>
+    <span class="c1">#     for i in range(len(selected_params)):</span>
+    <span class="c1">#         boundaries = selected_boundaries[i]</span>
+    <span class="c1">#         opt.enable_fit(selected_params[i])</span>
+    <span class="c1">#         opt.set_boundary(</span>
+    <span class="c1">#             selected_params[i],</span>
+    <span class="c1">#             [float(boundaries[0]), float(boundaries[1])]</span>
+    <span class="c1">#         )</span>
+    <span class="c1">#     #</span>
+    <span class="c1">#     # Lets loop and plot each solution!</span>
+    <span class="c1">#     opt.fit()</span>
+    <span class="c1">#     # -------------------------------------------------------------------- #</span>
+    <span class="c1">#     if rank_0_or_no_mpi:</span>
+    <span class="c1">#         index = -1</span>
+    <span class="c1">#         for solution, optimized_map, optimized_value, values in opt.get_solution():</span>
+    <span class="c1">#             index += 1</span>
+    <span class="c1">#             opt.update_model(optimized_map)</span>
+    <span class="c1">#             spectra = self.binned_spectrum.bin_model(</span>
+    <span class="c1">#                 self.atmosphere.calculate_model(</span>
+    <span class="c1">#                     0, self.observed_spectrum.wavenumberGrid</span>
+    <span class="c1">#                 )</span>
+    <span class="c1">#             )[1]</span>
+    <span class="c1">#             #</span>
+    <span class="c1">#             fig, axs = plt.subplots(4, 1, sharex=True, figsize=(12, 12), constrained_layout=True, dpi=500)</span>
+    <span class="c1">#             fig.suptitle(self.planet_name + &quot; observed vs model - Iteration: &quot; + str(index))</span>
+    <span class="c1">#             axs[0].errorbar(</span>
+    <span class="c1">#                 self.observed_spectrum.wavelengthGrid,</span>
+    <span class="c1">#                 self.observed_spectrum.spectrum,</span>
+    <span class="c1">#                 self.observed_spectrum.errorBar, label=&#39;Observed Spectrum&#39;, color=self.colors[-5], alpha=0.7</span>
+    <span class="c1">#             )</span>
+    <span class="c1">#             axs[0].set_ylabel(&quot;Ratio planet-stellar radii&quot;)</span>
+    <span class="c1">#             axs[0].legend()</span>
+    <span class="c1">#             #</span>
+    <span class="c1">#             axs[1].plot(</span>
+    <span class="c1">#                 self.observed_spectrum.wavelengthGrid,</span>
+    <span class="c1">#                 spectra,</span>
+    <span class="c1">#                 label=self.radiative_mod + &quot; model&quot;, color=self.colors[4], alpha=0.7</span>
+    <span class="c1">#             )</span>
+    <span class="c1">#             axs[1].set_ylabel(&quot;Ratio planet-stellar radii&quot;)</span>
+    <span class="c1">#             axs[1].legend()</span>
+    <span class="c1">#             #</span>
+    <span class="c1">#             axs[2].plot(</span>
+    <span class="c1">#                 self.observed_spectrum.wavelengthGrid,</span>
+    <span class="c1">#                 spectra,</span>
+    <span class="c1">#                 label=self.radiative_mod + &quot; model&quot;, color=self.colors[4], alpha=0.3</span>
+    <span class="c1">#             )</span>
+    <span class="c1">#             axs[2].errorbar(</span>
+    <span class="c1">#                 self.observed_spectrum.wavelengthGrid,</span>
+    <span class="c1">#                 self.observed_spectrum.spectrum,</span>
+    <span class="c1">#                 self.observed_spectrum.errorBar, label=&#39;Observed Spectrum&#39;, color=self.colors[-5], alpha=0.3</span>
+    <span class="c1">#             )</span>
+    <span class="c1">#             axs[2].set_ylabel(&quot;Ratio planet-stellar radii&quot;)</span>
+    <span class="c1">#             axs[2].legend()</span>
+    <span class="c1">#             #</span>
+    <span class="c1">#             axs[3].plot(</span>
+    <span class="c1">#                 self.observed_spectrum.wavelengthGrid,</span>
+    <span class="c1">#                 self.observed_spectrum.spectrum - spectra,</span>
+    <span class="c1">#                 label=&quot;Difference between observed and model&quot;, color=self.colors[10], alpha=0.7</span>
+    <span class="c1">#             )</span>
+    <span class="c1">#             axs[3].set_xlabel(&#39;Wavelength (um)&#39;)</span>
+    <span class="c1">#             axs[3].set_ylabel(&quot;Ratio planet-stellar radii&quot;)</span>
+    <span class="c1">#             axs[3].legend()</span>
+    <span class="c1">#             #</span>
+    <span class="c1">#             string_output = self.output_file + f&quot;_Iteration_{index}&quot;</span>
+    <span class="c1">#             plt.savefig(string_output + &quot;_results_comparison.png&quot;)</span>
+    <span class="c1">#             # plt.show()</span>
+    <span class="c1">#             plt.close(fig)</span>
+    <span class="c1">#             #</span>
+    <span class="c1">#             parameters = values[1][1]</span>
+    <span class="c1">#             print(&quot;Retrieval results:\n&quot;, parameters)</span>
+    <span class="c1">#             list_names = list()</span>
+    <span class="c1">#             list_distributions = list()</span>
+    <span class="c1">#             for key in parameters:</span>
+    <span class="c1">#                 list_names.append(key)</span>
+    <span class="c1">#                 list_distributions.append(parameters[key][&quot;trace&quot;])</span>
+    <span class="c1">#             #</span>
+    <span class="c1">#             fig = plt.figure(figsize=(20,20), dpi=500)</span>
+    <span class="c1">#             corner(</span>
+    <span class="c1">#                 data=np.array(list_distributions).T, labels=list_names, show_titles=True,</span>
+    <span class="c1">#                 title_fmt=&quot;.2f&quot;, fig=fig, color=self.colors[4]</span>
+    <span class="c1">#             )</span>
+    <span class="c1">#             plt.savefig(str(Path(</span>
+    <span class="c1">#                 string_output + &quot;_corner_plot.png&quot;</span>
+    <span class="c1">#             )))</span>
+    <span class="c1">#             # plt.show()</span>
+    <span class="c1">#             plt.close(fig)</span>
+    <span class="c1">#             #</span>
+    <span class="c1">#             with open(string_output + &quot;_results.pkl&quot;, &quot;wb&quot;) as f:</span>
+    <span class="c1">#                 pickle.dump(self.observed_spectrum.wavelengthGrid, f)</span>
+    <span class="c1">#                 pickle.dump(self.observed_spectrum.spectrum, f)</span>
+    <span class="c1">#                 pickle.dump(self.observed_spectrum.errorBar, f)</span>
+    <span class="c1">#                 pickle.dump(spectra, f)</span>
+    <span class="c1">#                 pickle.dump(solution, f)</span>
+    <span class="c1">#                 pickle.dump(optimized_map, f)</span>
+    <span class="c1">#                 pickle.dump(optimized_value, f)</span>
+    <span class="c1">#                 pickle.dump(values, f)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francesco Amadori, Paula Manuela Leguizamon Pineda, Leonardo Dal Cin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

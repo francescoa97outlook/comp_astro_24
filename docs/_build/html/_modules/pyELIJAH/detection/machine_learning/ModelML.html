@@ -1,0 +1,431 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyELIJAH.detection.machine_learning.ModelML &mdash; pyELIJAH 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyELIJAH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">pyELIJAH</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyELIJAH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyELIJAH.detection.machine_learning.ModelML</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyELIJAH.detection.machine_learning.ModelML</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">imblearn.over_sampling</span> <span class="kn">import</span> <span class="n">SMOTE</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">rint</span><span class="p">,</span> <span class="n">count_nonzero</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">accuracy_score</span><span class="p">,</span>
+    <span class="n">precision_score</span><span class="p">,</span>
+    <span class="n">recall_score</span><span class="p">,</span>
+    <span class="n">confusion_matrix</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="ModelML">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.ModelML.ModelML">[docs]</a>
+<span class="k">class</span> <span class="nc">ModelML</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Model ML class containing the arguments and methods to</span>
+<span class="sd">        generate ML models, train them and test them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">,</span> <span class="n">ML_type</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">degree_poly</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">data_shape</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">n_hidden_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_neurons</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">steps_per_epoch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">pool_size</span><span class="o">=</span><span class="mi">2</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This init the ModelML object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output_folder: path of the output folder where plot and log will be saved</span>
+<span class="sd">            ML_type: type of machine learning model [SVM, NN, CNN]</span>
+<span class="sd">            kernel: [SVM] type of kernel used for the model [rbf, linear, polynomial]</span>
+<span class="sd">            degree_poly: [SVM] type of polynomial used for the polynomial model</span>
+<span class="sd">            data_shape: [NN, CNN] shape of the input data for the input layer</span>
+<span class="sd">            n_hidden_layers: [NN, CNN] number of hidden layers (dense and dropout for NN,</span>
+<span class="sd">             MaxPool, Conv2D for CNN) in the model</span>
+<span class="sd">            n_neurons: [NN, CNN] number of neurons used for the hidden layers in the model</span>
+<span class="sd">            dropout_rate: [NN, CNN] dropout rate of the Dropout layer</span>
+<span class="sd">            epoch: [NN, CNN] number of epochs used for the model</span>
+<span class="sd">            steps_per_epoch: [NN, CNN] number of steps per epoch used for the model</span>
+<span class="sd">            batch_size: [NN, CNN] batch size used for the model</span>
+<span class="sd">            kernel_size: [CNN] size of the kernel used for the Conv2D layer</span>
+<span class="sd">            pool_size: [CNN] size of the pool used for the MaxPool2D layer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span> <span class="o">=</span> <span class="n">output_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span> <span class="o">=</span> <span class="n">ML_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">degree_poly</span> <span class="o">=</span> <span class="n">degree_poly</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_shape</span> <span class="o">=</span> <span class="n">data_shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden_layers</span> <span class="o">=</span> <span class="n">n_hidden_layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_neurons</span> <span class="o">=</span> <span class="n">n_neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span> <span class="o">=</span> <span class="n">dropout_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proceed_with_model</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">epoch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps_per_epoch</span> <span class="o">=</span> <span class="n">steps_per_epoch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span> <span class="o">=</span> <span class="n">kernel_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool_size</span> <span class="o">=</span> <span class="n">pool_size</span>
+        <span class="c1"># Get the current date and time</span>
+        <span class="n">current_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="c1"># Format the date and time in various styles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span> <span class="o">=</span> <span class="n">current_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y_%m_</span><span class="si">%d</span><span class="s2">T%H_%M_%S&quot;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - tf.keras.layers.Input(shape)</span>
+<span class="sd">          This layer defines the shape of the input data.</span>
+<span class="sd">          It acts as the starting point for the model, where shape specifies</span>
+<span class="sd">          the dimensions of the input</span>
+<span class="sd">        - tf.keras.layers.Flatten()</span>
+<span class="sd">          Converts multidimensional input data into a 1D array</span>
+<span class="sd">          NOT USEFUL IN OUR CASE</span>
+<span class="sd">        - tf.keras.layers.Dense(1, activation=&quot;relu&quot;)</span>
+<span class="sd">          A dense layer connects every input neuron to every output neuron (first argument) .</span>
+<span class="sd">          It applies a linear transformation followed by a non-linear</span>
+<span class="sd">          activation function.</span>
+<span class="sd">          Each neuron in this layer computes:</span>
+<span class="sd">          z = w1x1 + w2x2 + ⋯ + wnxn + b</span>
+<span class="sd">          w are learnable weights, x are inputs, b is the learnable bias term.</span>
+<span class="sd">          The result, z, is then passed through an activation</span>
+<span class="sd">          function (ReLU in this case) to introduce non-linearity: ReLU(z) = max(0,z)</span>
+<span class="sd">          Sets all negative values to 0, introducing non-linearity to the model.</span>
+<span class="sd">          This activation ensures that the layer can learn non-linear mappings,</span>
+<span class="sd">          which are crucial for solving complex problems.</span>
+<span class="sd">        - tf.keras.layers.Dropout(dropoutf),</span>
+<span class="sd">           Randomly sets 50% of the neurons in the previous layer to 0 during training.</span>
+<span class="sd">           This forces the network to learn robust patterns instead of</span>
+<span class="sd">           memorizing specific features.</span>
+<span class="sd">                - Overfitting occurs when the model performs well on training data but</span>
+<span class="sd">                poorly on unseen data. Dropout helps reduce overfitting.</span>
+<span class="sd">                - By &quot;turning off&quot; certain neurons, the network learns multiple</span>
+<span class="sd">                independent representations, improving generalization.</span>
+<span class="sd">          I.E. Without Dropout: Neuron A might dominate predictions because the model learns</span>
+<span class="sd">          to rely too heavily on it. With Dropout: Neuron A is occasionally disabled,</span>
+<span class="sd">          forcing other neurons to contribute to predictions.</span>
+<span class="sd">        - tf.keras.layers.Dense(1, activation=&quot;sigmoid&quot;),</span>
+<span class="sd">          Output layer</span>
+<span class="sd">          Outputs a single value, which represents the probability</span>
+<span class="sd">          that the input belongs to the positive class.</span>
+<span class="sd">          Uses the sigmoid activation function: sigma = 1 / (1 + e^-z)</span>
+<span class="sd">          This maps any input zz to the range [0, 1].</span>
+<span class="sd">          In a binary classification problem, the sigmoid ensures that</span>
+<span class="sd">          the output can be interpreted as a probability.</span>
+<span class="sd">          This is set to 1 because, in our case, we have only one class</span>
+<span class="sd">          (exoplanets or not)</span>
+<span class="sd">        - tf.keras.layers.Conv2D(filters, kernel_size),</span>
+<span class="sd">          This layer creates a convolution kernel that is convolved with</span>
+<span class="sd">          the layer input over a single spatial (or temporal) dimension</span>
+<span class="sd">          to produce a tensor of outputs.</span>
+<span class="sd">        - tf.keras.layers.MaxPool2D(pool_size),</span>
+<span class="sd">          Downsamples the input along its spatial dimensions (height and width)</span>
+<span class="sd">          by taking the maximum value over an input window (of size defined</span>
+<span class="sd">          by pool_size) for each channel of the input</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ModelML.build_model">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.ModelML.ModelML.build_model">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function builds the model used for the machine learning detection.</span>
+<span class="sd">        There are 3 possibilities:</span>
+<span class="sd">            - SVM, using scikit-learn SVC https://scikit-learn.org/dev/modules/generated/sklearn.svm.SVC.html</span>
+<span class="sd">            - NN, using tensorflow NN https://www.tensorflow.org/tutorials/quickstart/beginner</span>
+<span class="sd">            - CNN, using tensorflow CNN https://www.tensorflow.org/tutorials/images/cnn</span>
+<span class="sd">               also https://medium.com/@mayankverma05032001/binary-classification-using-convolution-neural-network-cnn-model-6e35cdf5bdbb</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Model uses support vector machine algorithm</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span> <span class="o">==</span> <span class="s2">&quot;svm&quot;</span><span class="p">:</span>
+            <span class="c1"># Model creation using the SVC function</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">degree_poly</span><span class="p">)</span>
+        <span class="c1"># Model uses neural networks algorithm</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span> <span class="o">==</span> <span class="s2">&quot;nn&quot;</span><span class="p">:</span>
+            <span class="c1"># Creation of the model</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Sequential</span><span class="p">()</span>
+            <span class="c1"># Add input layer large as the size of the input data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Input</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],)))</span>
+            <span class="c1"># Add flatten layer to create mono-dimensional the data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Flatten</span><span class="p">())</span>
+            <span class="c1"># Add a certain amount of dense and dropout layers</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_hidden_layers</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span><span class="p">))</span>
+            <span class="c1"># Add the output layer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;sigmoid&quot;</span><span class="p">))</span>
+            <span class="c1"># Loss funciton calculation</span>
+            <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">BinaryCrossentropy</span><span class="p">(</span><span class="n">from_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># Model compilation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">])</span>
+        <span class="c1"># Model uses convoluted neural networks algorithm</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span> <span class="o">==</span> <span class="s2">&quot;cnn&quot;</span><span class="p">:</span>
+            <span class="c1"># Creation of the model</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Sequential</span><span class="p">()</span>
+            <span class="c1"># Add Conv2D layer and specify input shape</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Conv2D</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">),</span>
+                <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;channels_last&quot;</span>
+            <span class="p">))</span>
+            <span class="c1"># Add a maxpooling layer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">MaxPool2D</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pool_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool_size</span><span class="p">),</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;channels_last&quot;</span>
+            <span class="p">))</span>
+            <span class="c1"># Add Dropout layer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span><span class="p">))</span>
+            <span class="c1"># Add a certain amount of convolution and maxpooling layers</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_hidden_layers</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Conv2D</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">),</span>
+                    <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">,</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;channels_last&quot;</span>
+                <span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">MaxPool2D</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pool_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool_size</span><span class="p">),</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;channels_last&quot;</span>
+                <span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span><span class="p">))</span>
+
+            <span class="c1"># Add a Flatten layer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Flatten</span><span class="p">(</span><span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;channels_last&quot;</span><span class="p">))</span>
+            <span class="c1"># Add dense layer for classification</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">))</span>
+            <span class="c1"># Add dropout layer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span><span class="p">))</span>
+            <span class="c1"># Add the output layer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">))</span>
+            <span class="c1"># Loss funciton calculation</span>
+            <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">BinaryCrossentropy</span><span class="p">(</span><span class="n">from_logits</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># Model compilation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span>
+                               <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">])</span>
+        <span class="c1"># The model does not exist</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The model you choose is not supported.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proceed_with_model</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ModelML.train">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.ModelML.ModelML.train">[docs]</a>
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function trains the model</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: array of elements used to train the model</span>
+<span class="sd">            Y: labels of the training data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If the model does not exist, end function</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">proceed_with_model</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># SVM model training</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span> <span class="o">==</span> <span class="s2">&quot;svm&quot;</span><span class="p">:</span>
+            <span class="c1"># Train model</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># NN model training</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span> <span class="o">==</span> <span class="s2">&quot;cnn&quot;</span><span class="p">:</span>
+                <span class="c1"># TODO: could this be used also for cnn?</span>
+                <span class="c1"># Add fitted samples to the data to enlarge the dataset</span>
+                <span class="n">sm</span> <span class="o">=</span> <span class="n">SMOTE</span><span class="p">()</span>
+                <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">fit_resample</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+            <span class="c1"># Train model</span>
+            <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch</span><span class="p">,</span>
+                                     <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+                                     <span class="n">steps_per_epoch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">steps_per_epoch</span><span class="p">)</span>
+            <span class="c1"># Plot accuracy of the model</span>
+            <span class="n">output_plot</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;plot_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span><span class="si">}</span><span class="s2">.png&quot;</span>
+                                   <span class="p">))</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;constrained&quot;</span><span class="p">)</span>
+            <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Layers: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_hidden_layers</span><span class="si">}</span><span class="s2">, neurons: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_neurons</span><span class="si">}</span><span class="s2">, Dropout rate: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">plot_title</span><span class="p">)</span>
+            <span class="c1"># list all data in history</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="c1"># summarize history for accuracy</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">])</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Model Accuracy&quot;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Accuracy&quot;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Epoch&quot;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="c1"># summarize history for loss</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">])</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Model Loss&quot;</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;epoch&quot;</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output_plot</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModelML.predict">
+<a class="viewcode-back" href="../../../../pyELIJAH.detection.machine_learning.html#pyELIJAH.detection.machine_learning.ModelML.ModelML.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y_results</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function predicts the class labels for the given data</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: array of elements used to derive the label from the trained model</span>
+<span class="sd">            Y_results: array of labels to che k the model results, if provided</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If the model does not exist, end function</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">proceed_with_model</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># Start of the log string</span>
+        <span class="n">log_temp</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;--------------------------------------&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span><span class="si">}</span><span class="s2"> model&quot;</span>
+        <span class="p">)</span>
+        <span class="c1"># Predict of the data for SVM model</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span> <span class="o">==</span> <span class="s2">&quot;svm&quot;</span><span class="p">:</span>
+            <span class="n">predicted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">log_temp</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--------------------------------------&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Kernel: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Degree (useful only if poly kernel): </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">degree_poly</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Predict of the data for NN and CNN model</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">predicted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+            <span class="n">log_temp</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--------------------------------------&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Number of dense and dropout layers: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_hidden_layers</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Number of neurons: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_neurons</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Dropout rate: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Epochs: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Batch size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span> <span class="o">==</span> <span class="s2">&quot;cnn&quot;</span><span class="p">:</span>
+                <span class="n">log_temp</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Kernel size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Pooling size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pool_size</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="n">predicted</span> <span class="o">=</span> <span class="n">rint</span><span class="p">(</span><span class="n">predicted</span><span class="p">)</span>
+        <span class="c1"># If results label are provided, it creates a statistics of precision and confusion matrix</span>
+        <span class="k">if</span> <span class="n">Y_results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">accuracy_train</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">Y_results</span><span class="p">,</span> <span class="n">predicted</span><span class="p">)</span>
+            <span class="c1"># Display the prediction results</span>
+            <span class="n">precision_train</span> <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">Y_results</span><span class="p">,</span> <span class="n">predicted</span><span class="p">)</span>
+            <span class="n">recall_train</span> <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">Y_results</span><span class="p">,</span> <span class="n">predicted</span><span class="p">)</span>
+            <span class="n">confusion_matrix_train</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">Y_results</span><span class="p">,</span> <span class="n">predicted</span><span class="p">)</span>
+            <span class="n">log_temp</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--------------------------------------&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error: </span><span class="si">{</span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">accuracy_train</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">------------&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Precision: </span><span class="si">{</span><span class="n">precision_train</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">------------&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Confusion Matrix:</span><span class="se">\n</span><span class="si">{</span><span class="n">confusion_matrix_train</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">------------&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Positive Predictions: </span><span class="si">{</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">predicted</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">------------&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Recall: </span><span class="si">{</span><span class="n">recall_train</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--------------------------------------&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log_temp</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--------------------------------------&quot;</span>
+                <span class="s2">&quot;No Y results provided, the error, precision, &quot;</span>
+                <span class="s2">&quot;confusion matrix and recall cannot be calculated&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--------------------------------------&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Print of the log and store in the log file</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">log_temp</span><span class="p">)</span>
+        <span class="n">output_log</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;log_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ML_type</span><span class="si">}{</span><span class="n">label</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_datetime</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_log</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">log_temp</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francesco Amadori, Paula Manuela Leguizamon Pineda, Leonardo Dal Cin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

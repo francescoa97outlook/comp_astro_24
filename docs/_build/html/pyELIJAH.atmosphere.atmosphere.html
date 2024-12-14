@@ -1,0 +1,471 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyELIJAH.atmosphere.atmosphere package &mdash; pyELIJAH 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pyELIJAH.atmosphere.retrieval package" href="pyELIJAH.atmosphere.retrieval.html" />
+    <link rel="prev" title="pyELIJAH.atmosphere package" href="pyELIJAH.atmosphere.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyELIJAH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pyELIJAH</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pyELIJAH.html">pyELIJAH package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pyELIJAH.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="pyELIJAH.atmosphere.html">pyELIJAH.atmosphere package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyELIJAH.dream.html">pyELIJAH.dream package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyELIJAH.detection.html">pyELIJAH.detection package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyELIJAH.parameters.html">pyELIJAH.parameters package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyELIJAH.html#module-pyELIJAH">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyELIJAH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">pyELIJAH</a></li>
+          <li class="breadcrumb-item"><a href="pyELIJAH.html">pyELIJAH package</a></li>
+          <li class="breadcrumb-item"><a href="pyELIJAH.atmosphere.html">pyELIJAH.atmosphere package</a></li>
+      <li class="breadcrumb-item active">pyELIJAH.atmosphere.atmosphere package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pyELIJAH.atmosphere.atmosphere.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pyelijah-atmosphere-atmosphere-package">
+<h1>pyELIJAH.atmosphere.atmosphere package<a class="headerlink" href="#pyelijah-atmosphere-atmosphere-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-pyELIJAH.atmosphere.atmosphere.Atmosphere">
+<span id="pyelijah-atmosphere-atmosphere-atmosphere-module"></span><h2>pyELIJAH.atmosphere.atmosphere.Atmosphere module<a class="headerlink" href="#module-pyELIJAH.atmosphere.atmosphere.Atmosphere" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyELIJAH.atmosphere.atmosphere.Atmosphere.</span></span><span class="sig-name descname"><span class="pre">Atmosphere</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atmosphere_yaml_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planet_yaml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_atmo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/Atmosphere.html#Atmosphere"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for generating and analyzing atmospheric models based on input
+configurations for planets and their atmospheres. It uses Taurex module.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.build_model">
+<span class="sig-name descname"><span class="pre">build_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/Atmosphere.html#Atmosphere.build_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.build_model" title="Link to this definition"></a></dt>
+<dd><p>Builds the atmospheric model based on the specified model type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>type_model</strong> – A string specifying the type of model to build. Options are:
+- “Transmission”: Builds a <cite>TransmissionModel</cite>.
+- “Emission”: Builds an <cite>EmissionModel</cite>.
+- Any other value defaults to a <cite>DirectImageModel</cite>.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Workflow:</dt><dd><ul class="simple">
+<li><p>Initializes the model object based on the provided <cite>type_model</cite> using the planet,
+temperature profile, chemistry, star, and atmospheric
+pressure range from <cite>atmosphere_yaml_file</cite>.</p></li>
+<li><dl class="simple">
+<dt>Adds the following contributions to the model:</dt><dd><ul>
+<li><p>Absorption contributions (<cite>AbsorptionContribution</cite>).</p></li>
+<li><p>CIA contributions (<cite>CIAContribution</cite>) based on <cite>cia_pairs</cite>
+from the YAML configuration.</p></li>
+<li><p>Rayleigh scattering contributions (<cite>RayleighContribution</cite>).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Calls the <cite>build</cite> method on the model to set up all the profiles and
+prepare the model for further calculations.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.calculate_model">
+<span class="sig-name descname"><span class="pre">calculate_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">binning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenumberGrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/Atmosphere.html#Atmosphere.calculate_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.calculate_model" title="Link to this definition"></a></dt>
+<dd><p>Calculates the atmospheric model, with optional binning of the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>binning</strong> – A boolean indicating whether to apply binning to the calculated model.
+Default is False.</p></li>
+<li><p><strong>wavenumberGrid</strong> – An optional array specifying the wavenumber grid to use for the model calculation.
+If None, the default grid is used.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Workflow:</dt><dd><ul class="simple">
+<li><p>If <cite>binning</cite> is True, bins the model output using the <cite>SimpleBinner</cite> object.</p></li>
+<li><p>If <cite>binning</cite> is False, calculates the model directly on the specified or
+default wavenumber grid.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The calculated atmospheric model, either binned or unbinned,
+depending on the <cite>binning</cite> argument.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.compare_models">
+<span class="sig-name descname"><span class="pre">compare_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">binning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/Atmosphere.html#Atmosphere.compare_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.compare_models" title="Link to this definition"></a></dt>
+<dd><p>Compares the calculated atmospheric models for Transmission, Emission,
+and Direct Imaging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>binning</strong> – A boolean indicating whether to apply binning to the calculated models.
+Default is False.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Workflow:</dt><dd><ul class="simple">
+<li><p>Builds and calculates the atmospheric model for “Transmission”.</p></li>
+<li><p>Builds and calculates the atmospheric model for “Emission”.</p></li>
+<li><p>Builds and calculates the atmospheric model for “Direct Image”.</p></li>
+<li><p>Plots the ratio of planet-to-stellar radii for each model against the wavelength.</p></li>
+<li><dl class="simple">
+<dt>Creates a subplot for each model:</dt><dd><ul>
+<li><p>The first subplot displays the Transmission model.</p></li>
+<li><p>The second subplot displays the Emission model.</p></li>
+<li><p>The third subplot displays the Direct Image model.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Saves the comparison plot as an image file named “&lt;output_file&gt;_compare.png”.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.create_binning_obj">
+<span class="sig-name descname"><span class="pre">create_binning_obj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/Atmosphere.html#Atmosphere.create_binning_obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.create_binning_obj" title="Link to this definition"></a></dt>
+<dd><p>Creates a binning object and initializes the wavenumber grid.</p>
+<p>Args:</p>
+<dl class="simple">
+<dt>Workflow:</dt><dd><ul class="simple">
+<li><p>Generates a sorted wavenumber grid (<cite>wngrid</cite>) by converting from
+logarithmic wavelength spacing.</p></li>
+<li><p>Initializes a <cite>SimpleBinner</cite> object using the generated <cite>wngrid</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.generate_profiles">
+<span class="sig-name descname"><span class="pre">generate_profiles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/Atmosphere.html#Atmosphere.generate_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.generate_profiles" title="Link to this definition"></a></dt>
+<dd><p>Generates the necessary profiles for the atmosphere, planet,
+and star based on the YAML configuration files.</p>
+<p>Args:</p>
+<dl class="simple">
+<dt>Workflow:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>Checks the “temperature_profile” key in <cite>atmosphere_yaml_file</cite>:</dt><dd><ul>
+<li><p>If “isothermal”, initializes an <cite>Isothermal</cite> temperature profile
+using the planet’s equilibrium temperature.</p></li>
+<li><p>Otherwise, initializes a <cite>Guillot2010</cite> temperature profile.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Assigns the planet’s name from the YAML configuration.</p></li>
+<li><p>Initializes the planet’s properties (<cite>Planet</cite>) using radius
+and mass from <cite>planet_yaml</cite>.</p></li>
+<li><p>Initializes the star’s properties (<cite>BlackbodyStar</cite>) using temperature
+and radius from <cite>planet_yaml</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.plot_flux">
+<span class="sig-name descname"><span class="pre">plot_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result_model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/Atmosphere.html#Atmosphere.plot_flux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.plot_flux" title="Link to this definition"></a></dt>
+<dd><p>Plots the calculated flux spectrum and saves it as an image and data file.</p>
+<blockquote>
+<div><dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>result_model:</dt><dd><dl class="simple">
+<dt>A tuple containing:</dt><dd><ul class="simple">
+<li><p><cite>wn</cite>: Wavenumber grid.</p></li>
+<li><p><cite>ratio_rp_rs</cite>: Ratio of planet-to-stellar radii.</p></li>
+<li><p><cite>tau</cite>: Optical depth (unused in plotting).</p></li>
+<li><p>Additional model output (unused in plotting).</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>Workflow:</dt><dd><ul class="simple">
+<li><p>Plots the ratio of planet-to-stellar radii against the wavelength.</p></li>
+<li><p>Saves the plot as an image file named “&lt;output_file&gt;_flux.png”.</p></li>
+<li><p>Saves the flux data to a <cite>.dat</cite> file with columns: wavelength,</p></li>
+</ul>
+<p>radius ratio, and an estimated uncertainty.</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.plot_gases">
+<span class="sig-name descname"><span class="pre">plot_gases</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/Atmosphere.html#Atmosphere.plot_gases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.plot_gases" title="Link to this definition"></a></dt>
+<dd><p>Plots the mixing ratios of active and inactive gases in the atmosphere.</p>
+<blockquote>
+<div><p>Args:</p>
+<dl>
+<dt>Workflow:</dt><dd><ul class="simple">
+<li><p>Creates a plot showing the mixing ratios of active and</p></li>
+</ul>
+<blockquote>
+<div><p>inactive gases against the pressure profile.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Uses logarithmic scaling for both axes.</p></li>
+<li><p>Inverts the y-axis to represent pressure decreasing with altitude.</p></li>
+<li><p>Saves the plot as an image file named “&lt;output_file&gt;_gases.png”.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.read_opacities_and_create_chemistry">
+<span class="sig-name descname"><span class="pre">read_opacities_and_create_chemistry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/Atmosphere.html#Atmosphere.read_opacities_and_create_chemistry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.Atmosphere.Atmosphere.read_opacities_and_create_chemistry" title="Link to this definition"></a></dt>
+<dd><p>Reads opacity data, sets up chemistry models, and generates
+cross-section plots if required.</p>
+<p>Args:</p>
+<dl>
+<dt>Workflow:</dt><dd><ul>
+<li><p>Clears any cached opacity data and sets the paths for cross-section
+(<cite>xsec_path</cite>) and CIA (<cite>hitran_path</cite>) files.</p></li>
+<li><p>Initializes a free chemistry model (<cite>TaurexChemistry</cite>)
+with fill gases and a mixing ratio.</p></li>
+<li><dl>
+<dt>Iterates over the molecules specified in <cite>dict_molecs</cite>:</dt><dd><ul class="simple">
+<li><p>Computes the mixing ratio for each molecule based on the configuration.</p></li>
+<li><p>Adds the molecule as a constant gas to the chemistry model.</p></li>
+<li><p>If plotting is enabled, logs the mixing ratio and plots the</p></li>
+</ul>
+<p>cross-section for each molecule.</p>
+</dd>
+</dl>
+</li>
+<li><p>Handles exceptions for missing molecules in HITRAN and logs a
+message if plotting is enabled.</p></li>
+<li><dl class="simple">
+<dt>If <cite>plot</cite> is enabled:</dt><dd><ul class="simple">
+<li><p>Creates and saves cross-section plots for each molecule,
+showing wave number vs cross-section for specific temperature
+and pressure conditions.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pyELIJAH.atmosphere.atmosphere.run_atmosphere">
+<span id="pyelijah-atmosphere-atmosphere-run-atmosphere-module"></span><h2>pyELIJAH.atmosphere.atmosphere.run_atmosphere module<a class="headerlink" href="#module-pyELIJAH.atmosphere.atmosphere.run_atmosphere" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.run_atmosphere.atmosphere_exc">
+<span class="sig-prename descclassname"><span class="pre">pyELIJAH.atmosphere.atmosphere.run_atmosphere.</span></span><span class="sig-name descname"><span class="pre">atmosphere_exc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atmosphere_yaml_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planet_yaml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_atmo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/run_atmosphere.html#atmosphere_exc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.run_atmosphere.atmosphere_exc" title="Link to this definition"></a></dt>
+<dd><p>This function executes the atmospheric model generation and analysis for a specific atmosphere and planet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_folder</strong> – A string containing the path to the folder where input YAML files are stored.</p></li>
+<li><p><strong>output_folder</strong> – A string containing the path to the folder where output files will be saved.</p></li>
+<li><p><strong>atmosphere_yaml_file</strong> – A dictionary representing the YAML configuration for the atmosphere.</p></li>
+<li><p><strong>planet_yaml</strong> – An instance of the <cite>Parameters</cite> class containing the planet configuration.</p></li>
+<li><p><strong>index_atmo</strong> – An integer indicating the index of the atmosphere. Default is 1.</p></li>
+<li><p><strong>plot</strong> – A boolean indicating whether to generate plots for the atmospheric
+calculations. Default is True.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Workflow:</dt><dd><ul class="simple">
+<li><p>Initialize the <cite>Atmosphere</cite> object with the provided configurations.</p></li>
+<li><p>Generate atmospheric profiles.</p></li>
+<li><p>Read opacities and set up the chemical models.</p></li>
+<li><p>Create binning objects for radiative transfer calculations.</p></li>
+<li><p>Build the radiative transfer model.</p></li>
+<li><p>Calculate the atmospheric model using the specified binning resolution.</p></li>
+<li><p>Generate plots for gases, fluxes, and model comparisons.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An <cite>Atmosphere</cite> object containing the results of the atmospheric calculations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyELIJAH.atmosphere.atmosphere.run_atmosphere.run_atmosphere">
+<span class="sig-prename descclassname"><span class="pre">pyELIJAH.atmosphere.atmosphere.run_atmosphere.</span></span><span class="sig-name descname"><span class="pre">run_atmosphere</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaml_files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyELIJAH/atmosphere/atmosphere/run_atmosphere.html#run_atmosphere"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyELIJAH.atmosphere.atmosphere.run_atmosphere.run_atmosphere" title="Link to this definition"></a></dt>
+<dd><p>This function processes atmosphere YAML configuration files and performs
+atmospheric calculations for specified planets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_folder</strong> – A string containing the path to the folder where input YAML files are stored.</p></li>
+<li><p><strong>output_folder</strong> – A string containing the path to the folder where output files will be saved.</p></li>
+<li><p><strong>yaml_files</strong> – A list of dictionaries, each representing an atmosphere YAML configuration file.
+Each dictionary  should include a “planet” key containing a
+list of planet YAML file paths.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Workflow:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>For each atmosphere YAML file:</dt><dd><ul>
+<li><p>Retrieve the planet YAML files specified under the “planet” key.</p></li>
+<li><p>Execute atmospheric calculations for each planet using the <cite>atmosphere_exc</cite> function.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyELIJAH.atmosphere.atmosphere">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyELIJAH.atmosphere.atmosphere" title="Link to this heading"></a></h2>
+<p>Init for Atmosphere submodule</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyELIJAH.atmosphere.html" class="btn btn-neutral float-left" title="pyELIJAH.atmosphere package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyELIJAH.atmosphere.retrieval.html" class="btn btn-neutral float-right" title="pyELIJAH.atmosphere.retrieval package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francesco Amadori, Paula Manuela Leguizamon Pineda, Leonardo Dal Cin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

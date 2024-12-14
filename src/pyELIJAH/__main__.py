@@ -40,7 +40,12 @@ def main():
       "nn" for neural network, "cnn" for convolutional neural network.
     - pyelijah -dr, --dream: used to call the GAN architecture that allows
       to 'dream' a new exoplanetary transit light curve
-    - pyelijah -a, --atmosphere: atmospheric characterisation from input transmission spectrum
+    - pyelijah -p, --parallel: Execute the retrievals parallelized one per core
+    - pyelijah -a, --atmosphere: Command that is used to accept a limited set of strings
+      concerning the atmsphere characterization.
+      The accepted values are: "model" to just calculate a model spectrum,
+      "retrieval" to execute a MCMC retrieval to characterize the observed spectrum.
+
     Args:
 
     Returns:
@@ -163,6 +168,17 @@ def main():
         help="Atmospheric Characterisation from "
              "input transmission spectrum",
     )
+    # Define an expected command -t.
+    # It is not required and will be used with key parallel
+    # to parallelize the retrievals
+    parser.add_argument(
+        "-p",
+        "--parallel",
+        dest="parallel",
+        required=False,
+        help="Execute one retrieval per core",
+        action="store_true",
+    )
     # ------------------------------------------------------------------------------- #
     # ------------------------------------------------------------------------------- #
     # This command will parse (convert) the arguments
@@ -262,7 +278,7 @@ def main():
         else:
             print("Error in command list. Check the arguments")
     # ---------------------------------- #
-    #
+    parallel = args.parallel
     if args.atmosphere:
         action = args.atmosphere
         params_atmosphere_list = list()
@@ -275,7 +291,7 @@ def main():
             elif action == "retrieval":
                 for file in files_yaml_retrievals:
                     params_atmosphere_list.append(Parameters(Path(input_folder, file)))
-                run_retrieval(input_folder, output_folder, params_atmosphere_list)
+                run_retrieval(input_folder, output_folder, params_atmosphere_list, parallel)
             else:
                 print("Error in command list. Check the arguments")
         else:
