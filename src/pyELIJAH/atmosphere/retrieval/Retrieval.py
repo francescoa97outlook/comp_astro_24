@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib import colormaps as cmp
 from taurex.data.spectrum import ObservedSpectrum
 from taurex.optimizer.nestle import NestleOptimizer
+from taurex.optimizer.multinest import MultiNestOptimizer
 import taurex.log
 taurex.log.disableLogging()
 
@@ -175,9 +176,18 @@ class Retrieval:
             selected_params.append(param)
             selected_boundaries.append(parameters_to_fit[param])
         # -------------------------------------------------------------------- #
-        opt = NestleOptimizer(
-            num_live_points=int(self.retrieval_file.get("num_live_points")),
-        )
+        output_fold_ret = str(Path(self.output_folder, self.planet_name))
+        if self.retrieval_file.get("multi_nest"):
+            opt = MultiNestOptimizer(
+                multi_nest_path=output_fold_ret,
+                num_live_points=int(self.retrieval_file.get("num_live_points")),
+                max_iterations=15000,
+                evidence_tolerance=1
+            )
+        else:
+            opt = NestleOptimizer(
+                num_live_points=int(self.retrieval_file.get("num_live_points")),
+            )
         # Forward model and observation:
         opt.set_model(self.atmosphere.model)
         opt.set_observed(self.observed_spectrum)
