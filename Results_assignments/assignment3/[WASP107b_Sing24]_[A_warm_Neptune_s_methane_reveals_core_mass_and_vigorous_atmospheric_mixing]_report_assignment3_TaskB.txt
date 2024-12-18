@@ -1,0 +1,21 @@
+Planet Name : "WASP107-b"
+Period : 5.72148926 days
+Planet Radius : 0.94 RJup
+Planet Mass : 0.12 MJup
+Planet Temperature Eq : 770 K
+Semi-major axis : 18.2 rp/rs
+Inclination : 89.7 deg
+Eccentricity : 0. 
+Argument of periastrum : 90. deg
+t14h : 2.753 hours
+stellar_radius : 0.66 RSun
+stellar_temperature : 4430 K
+t0_bjd_tdb : 2460118.948861 JD days
+vmr log(H2O) : -1.85
+vmr log(CH4) : -6.03
+vmr log(CO2) : -3.33
+vmr log(CO) : -2.7
+vmr log(SO2) : -5.06
+vmr log(H2S) : -3.48
+vmr log(NH3) : -6.38
+
