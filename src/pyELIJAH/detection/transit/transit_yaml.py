@@ -70,7 +70,7 @@ def transit_yaml(param_obj_list, output_folder_path, input_folder_path, multi):
         params.per = yaml_params.get("period")
         # planet radius (in units of stellar radii)
         planet_radius = yaml_params.get("planet_radius") * c.RJ
-        stellar_radius = yaml_params.get("planet_radius") * c.RSun
+        stellar_radius = yaml_params.get("stellar_radius") * c.RSun
         params.rp = planet_radius / stellar_radius
         # semi-major axis (in units of stellar radii)
         params.a = yaml_params.get("a")
